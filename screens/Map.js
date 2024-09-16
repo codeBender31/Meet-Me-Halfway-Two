@@ -49,7 +49,7 @@ const Map = ({ userAddress, friendAddress, midpoint }) => {
   return (
     <MapView
       ref={mapRef}
-      style={{ flex: 1, width: '100%', height: 300 }}
+      style={{ flex: 1, width: '100%', height: 300, marginBottom: 200 }}
       initialRegion={{
         latitude: 39.8283,
         longitude: -98.5795,
