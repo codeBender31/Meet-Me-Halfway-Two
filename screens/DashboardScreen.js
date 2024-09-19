@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import Parse from 'parse/react-native.js';
@@ -68,7 +68,7 @@ const DashboardScreen = () => {
 
   const reverseGeocodeMidpoint = async (lat, lng) => {
     try {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc`);
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=YOUR_GOOGLE_API_KEY`);
       const data = await response.json();
       return data.results[0]?.formatted_address || 'Address not found';
     } catch (error) {
@@ -115,7 +115,7 @@ const DashboardScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={styles.largeText}>Welcome, {username}!</Text>
 
@@ -176,7 +176,11 @@ const DashboardScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <View style={{ flex: 1 }}>
+          <View style={{ flex:1}}>
+            < Map userAddress={userAddress} friendAddress={friendAddress} midpoint={midpoint} />
+          </View>
+
+          <View>
             <Picker
               selectedValue={selectedFriend ? selectedFriend.id : null}
               onValueChange={(itemValue) => {
@@ -194,62 +198,60 @@ const DashboardScreen = () => {
               })}
             </Picker>
           </View>
-
-          <TouchableOpacity
-            style={styles.bigButton}
-            onPress={findMeetingPoint}
-          >
-            <Text style={styles.bigButtonText}>Find Meeting Point</Text>
-          </TouchableOpacity>
-
-          {midpoint && (
+          <View style={styles.bottomButtons}>
             <TouchableOpacity
               style={styles.bigButton}
-              onPress={() => openGoogleMaps(midpoint.lat, midpoint.lng)}
+              onPress={findMeetingPoint}
             >
-              <Text style={styles.bigButtonText}>Open in Google Maps</Text>
+              <Text style={styles.bigButtonText}>Find Meeting Point</Text>
             </TouchableOpacity>
-          )}
 
-          <TouchableOpacity
-            style={styles.bigButton}
-            onPress={() => {
-              if (midpoint && selectedFriend) {
-                const currentUser = Parse.User.current();
-                console.log("CurrentUser " + currentUser);
-                const coordinates = midpoint;
-                console.log("Coordinates " + coordinates);
-                const location = midpointAddress;
-                console.log("Address " + midpointAddress);
-                const user1Id = currentUser.id;
-                console.log("User1 " + user1Id);
-                const user2Id = selectedFriend.id;
-                console.log(selectedFriend.name);
-                console.log("User2 " + user2Id);
+            {midpoint && (
+              <TouchableOpacity
+                style={styles.bigButton}
+                onPress={() => openGoogleMaps(midpoint.lat, midpoint.lng)}
+              >
+                <Text style={styles.bigButtonText}>Open in Google Maps</Text>
+              </TouchableOpacity>
+            )}
 
-                createMeeting(user1Id, user2Id, location, coordinates, time, date)
-                  .then(() => {
-                    Alert.alert('Meeting created successfully!');
-                  })
-                  .catch((error) => {
-                    console.error('Error creating meeting:', error);
-                    Alert.alert('Error', 'Failed to create meeting. Please try again.');
-                  });
-              } else {
-                Alert.alert('Error', 'Please select a friend and find the midpoint first.');
-              }
-            }}
-          >
-            <Text style={styles.bigButtonText}>Create Meeting</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.bigButton}
+              onPress={() => {
+                if (midpoint && selectedFriend) {
+                  const currentUser = Parse.User.current();
+                  console.log("CurrentUser " + currentUser);
+                  const coordinates = midpoint;
+                  console.log("Coordinates " + coordinates);
+                  const location = midpointAddress;
+                  console.log("Address " + midpointAddress);
+                  const user1Id = currentUser.id;
+                  console.log("User1 " + user1Id);
+                  const user2Id = selectedFriend.id;
+                  console.log(selectedFriend.name);
+                  console.log("User2 " + user2Id);
 
-          <View style={{ flex: 1 }}>
-            <Map userAddress={userAddress} friendAddress={friendAddress} midpoint={midpoint} />
+                  createMeeting(user1Id, user2Id, location, coordinates, time, date)
+                    .then(() => {
+                      Alert.alert('Meeting created successfully!');
+                    })
+                    .catch((error) => {
+                      console.error('Error creating meeting:', error);
+                      Alert.alert('Error', 'Failed to create meeting. Please try again.');
+                    });
+                } else {
+                  Alert.alert('Error', 'Please select a friend and find the midpoint first.');
+                }
+              }}
+            >
+              <Text style={styles.bigButtonText}>Create Meeting</Text>
+            </TouchableOpacity>
           </View>
-
         </View>
+
+
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -287,9 +289,9 @@ const localStyles = StyleSheet.create({
     width: '100%',
   },
   scrollView: {
-    flex: 1,
-    backgroundColor: '#f8f8f8',
+    paddingVertical: 10, // Provide space to scroll content
   },
+
 });
 
 export default DashboardScreen;
