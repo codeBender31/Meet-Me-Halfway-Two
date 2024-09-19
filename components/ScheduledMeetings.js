@@ -1,6 +1,5 @@
-//This modal will display any meeting objects that have been stored in the database and already sent out through sms
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import Parse from 'parse/react-native.js';
 
 const ScheduledMeetings = () => {
@@ -39,12 +38,16 @@ const ScheduledMeetings = () => {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    );
   }
 
   return (
-    <View>
-      <Text>Scheduled Meetings</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Scheduled Meetings</Text>
       {meetings.length > 0 ? (
         <FlatList
           data={meetings}
@@ -60,20 +63,57 @@ const ScheduledMeetings = () => {
             const otherUser = user1.id === Parse.User.current().id ? user2 : user1;
 
             return (
-              <View style={{ padding: 10, borderBottomWidth: 1 }}>
-                <Text>Meeting with: {otherUser.get('username')}</Text>
-                <Text>Location: {location}</Text>
-                <Text>Date: {date}</Text>
-                <Text>Time: {time}</Text>
+              <View style={styles.meetingItem}>
+                <Text style={styles.meetingText}>Meeting with: {otherUser.get('username')}</Text>
+                <Text style={styles.meetingText}>Location: {location}</Text>
+                <Text style={styles.meetingText}>Date: {date}</Text>
+                <Text style={styles.meetingText}>Time: {time}</Text>
               </View>
             );
           }}
         />
       ) : (
-        <Text>No scheduled meetings found.</Text>
+        <Text style={styles.noDataText}>No scheduled meetings found.</Text>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#ccc',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+  },
+  meetingItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  meetingText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  noDataText: {
+    color: '#555',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+});
 
 export default ScheduledMeetings;

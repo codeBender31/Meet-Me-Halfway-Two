@@ -8,7 +8,7 @@ export const determineGlobalStyles = () => {
 
   const colorPalette = {
     light: {
-      background: '#A1C6EA',
+      background: '#fff',
       text: '#000',
       buttonBackground: '#fff',
       buttonText: '#075985',
@@ -111,7 +111,7 @@ export const determineGlobalStyles = () => {
         justifyContent: 'center',
         marginBottom: 20,
       },
-  
+
     switchButton: {
       padding: 10,
       backgroundColor: '#ddd',
