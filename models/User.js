@@ -12,62 +12,64 @@ class User {
   constructor() {
     this.user = new Parse.User();
   }
+  //Set user first name 
   setFirstName(firstName){
     this.user.set('firstName', firstName);
   }
-
+//Set the user last name 
   setLastName(lastName){
     this.user.set('lastName', lastName)
   }
-
+//Set the user email 
   setEmail(email) {
     this.user.set('email', email);
   }
-
-
+//Set the user phone number 
   setPhoneNumber(phoneNumber) {
-  
+  //Set the regular expression that contains bounds 
     const phoneRegex = /^[0-9]{10,15}$/;
     if (!phoneRegex.test(phoneNumber)) {
       throw new Error('Invalid phone number format. Must be between 10 to 15 digits.');
     }
+    //If it is valid then set the phone number 
     this.user.set('phoneNumber', phoneNumber);
   }
-
+//Set the user name for the user 
   setUsername(username) {
     this.user.set('username', username);
   }
-
+//Set the password for the user 
   setPassword(password) {
     this.user.set('password', password);
   }
-
+//Call the async signup method 
   async signUp() {
+    //Await for the response 
     try {
       const result = await this.user.signUp();
       return result; 
-    } catch (err) {
+    } catch (err) { //Throw out any errors if present 
       throw new Error(err.message); 
     }
   }
-
+//Call the async login method 
   static async login(username, password) {
     try {
       const user = await Parse.User.logIn(username, password);
       return user;
-    } catch (err) {
+    } catch (err) {//Throw out any errors if present 
       throw new Error(err.message);
     }
   }
-
+//Call the async logout method 
   static async logout() {
     try {
       await Parse.User.logOut();
-    } catch (err) {
+    } catch (err) {//Throw out any errors if present 
       throw new Error(err.message);
     }
   }
-
+//Get the current user that is logged in 
   static getCurrentUser() {
     return Parse.User.current();
   }
