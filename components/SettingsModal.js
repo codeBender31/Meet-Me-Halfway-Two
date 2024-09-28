@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Switch, TextInput, ScrollView, StyleSheet } from 'react-native';
 
 const SettingsScreen = () => {
+  //Set the states that will be controlled in the page 
+  //They are only placeholders for now 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const [selectedLanguage, setSelectedLanguage] = useState('English'); 
+//Here are the fields that users will be able to change in their settings page 
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -14,8 +18,12 @@ const SettingsScreen = () => {
   const languages = ['English', 'Spanish', 'French'];
   const fonts = ['Default', 'Serif', 'Sans-serif', 'Monospace'];
 
+//Create the dark mode/light mode toggle
+
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+//Create the notifications toggle 
   const toggleNotifications = () => setIsNotificationsEnabled(!isNotificationsEnabled);
+//Create the toggle for the location 
   const toggleLocation = () => setIsLocationEnabled(!isLocationEnabled);
 
   const handleUsernameSubmit = () => {
@@ -41,25 +49,41 @@ const SettingsScreen = () => {
 
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Dark Mode</Text>
-        <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
+
+        {/*Declare the switch for the light/dark mode */}
+        <Switch
+          value={isDarkMode}
+          onValueChange={toggleDarkMode}
+        />
+
       </View>
 
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Enable Notifications</Text>
-        <Switch value={isNotificationsEnabled} onValueChange={toggleNotifications} />
+
+           {/*Declare the switch for the notifications */}
+        <Switch
+          value={isNotificationsEnabled}
+          onValueChange={toggleNotifications}
+        />
+
       </View>
 
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Share Location</Text>
-        <Switch value={isLocationEnabled} onValueChange={toggleLocation} />
-      </View>
 
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Account Settings</Text>
+           {/*Declare the switch for the locations preference */}
+        <Switch
+          value={isLocationEnabled}
+          onValueChange={toggleLocation}
+        />
       </View>
+             
+      {/*For security purposes these cannot be this simple*/}
+      {/*We need to set security measures for them */}
+      <View style={styles.settingItem}>
+        <Text style={styles.settingText}>Change Username</Text>
 
-      {/* Change Username */}
-      <View style={styles.settingItemColumn}>
         <TextInput
           style={styles.input}
           placeholder="Change Username"
@@ -107,12 +131,13 @@ const SettingsScreen = () => {
 
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>App Version</Text>
-        <Text style={styles.versionText}>1.0.0</Text>
+        {/*Since this is a second version*/}
+        <Text style={styles.versionText}>2.0.0</Text>
       </View>
     </ScrollView>
   );
 };
-
+//Temporary styling 
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,

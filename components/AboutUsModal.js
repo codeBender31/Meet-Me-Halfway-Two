@@ -1,9 +1,11 @@
 //This will be the About us Page
+//Necessary imports 
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { determineGlobalStyles } from './Styles';
 
 function AboutUsModal({ navigation }) {
+  //Inherit the styling from Styles.js
   let { styles, determinedLogo } = determineGlobalStyles();
 
   return (

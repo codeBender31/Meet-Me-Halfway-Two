@@ -1,19 +1,26 @@
 //Side Menu components and icons
+//Here is where you will add any new pages when users are logged in
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
+//Import the icons for the side menu 
 import { Ionicons } from '@expo/vector-icons';
 import Parse from 'parse/react-native.js';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext'; 
+//Determined styling from Styles.js 
 import { determineGlobalStyles } from '../components/Styles'; 
 
 const SideMenu = (props) => {
+//Get the style sheet 
 let {styles} = determineGlobalStyles()
+//Make sure the user is logged in
+//Obtain their username 
   const currentUser = Parse.User.current();
+  //This is only for testing, will remove later 
   const username = currentUser ? currentUser.getUsername() : 'Guest';
   const navigation = useNavigation();
-
+//Once they explicitly log out, show a delay and animation 
   const handleLogout = async () => {
     try {
       await Parse.User.logOut();
@@ -25,7 +32,9 @@ let {styles} = determineGlobalStyles()
     }
   };
 
+  //Render the page 
   return (
+    //Set up the props
     <DrawerContentScrollView {...props}>
       <View style={styles.profileSection}>
         <Image
@@ -34,7 +43,7 @@ let {styles} = determineGlobalStyles()
         />
         <Text style={styles.profileName}>{username}</Text>
       </View>
-
+      {/*Here we declare all components from the side menu */}
       <DrawerItem
         icon={({ color, size }) => (
             <Ionicons name="navigate-outline" size={size} color={styles.drawerIconColor.color} />
@@ -99,7 +108,7 @@ let {styles} = determineGlobalStyles()
     </DrawerContentScrollView>
   );
 };
-
+//This styling applies only to the side menu and applies to anything not using global styles 
 const localStyles = StyleSheet.create({
   profileSection: {
     padding: 20,
