@@ -12,20 +12,29 @@ import { determineGlobalStyles } from '../components/Styles';
 import { createMeeting, openGoogleMaps } from '../models/Meeting'; 
 
 const DashboardScreen = () => {
+  //Determine the styling for the dashboard 
   let { styles } = determineGlobalStyles();
-
+  //Set the username 
   const [username, setUsername] = useState('');
+  //Set the user1 address 
   const [selectedUserAddress, setSelectedUserAddress] = useState('');
+  //Set the selected connection address
   const [selectedFriendAddress, setSelectedFriendAddress] = useState('');
+  //User address used for calculations 
   const [userAddress, setUserAddress] = useState('');
+  //Friend address used for calculations 
   const [friendAddress, setFriendAddress] = useState('');
+  //Variable to hold the midpoint for calculation 
   const [midpoint, setMidpoint] = useState(null);
   const [selectedFriend, setSelectedFriend] = useState(null);
+  //Empty array to display friends if there are no friends 
   const [friends, setFriends] = useState([]);
+  //Set the midpoint address for the meeting object 
   const [midpointAddress, setMidpointAddress] = useState('');
+  //Current time 
   const [time, setTime] = useState(formatCurrentTime(new Date()));
-  const [date, setDate] = useState(new Date());
-
+  //Current date 
+  const [date, setDate] = useState(new Date());us
   const navigation = useNavigation();
 
  
