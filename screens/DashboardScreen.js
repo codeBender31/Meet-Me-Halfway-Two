@@ -23,7 +23,7 @@ const DashboardScreen = () => {
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [friends, setFriends] = useState([]);
   const [midpointAddress, setMidpointAddress] = useState('');
-  const [time, setTime] = useState('12:00 PM');
+  const [time, setTime] = useState(formatCurrentTime(new Date()));
   const [date, setDate] = useState(new Date());
 
   const navigation = useNavigation();
@@ -83,6 +83,24 @@ const DashboardScreen = () => {
     }
   };
 
+  //Method to set the time for the meeting object
+  const formatCurrentTime = (date) => {
+    //Define the hours 
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let dayOrNight = hours >= 12 ? 'PM' : 'AM';
+
+    //Convert to 12 hour format 
+    hours = hours % 12
+    //Incase hours is equal to 0 then set it to 12 or mid day 
+    hours = hours ? hours : 12 ;
+    //Add a zero if needed 
+    let formattedTime = minutes  < 10 ? `0${minutes}` : minutes; 
+
+    return `${hours}:${formattedTime} ${dayOrNight}`;
+  };
+
+  //Method to create the meeting object that will be sent out 
   const handleCreateMeeting = async () => {
     if (midpoint && selectedFriend) {
       const currentUser = Parse.User.current();
