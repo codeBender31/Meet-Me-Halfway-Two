@@ -1,13 +1,14 @@
 //This will have selector at the top to swithc between Find Connections and My Connections
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { determineGlobalStyles } from '../components/Styles';
 import { getMyConnections, getAllUsers, getPendingRequests, handleFriendRequest, removeFriend, sendFriendRequest} from '../models/Connection';  // Import the getPendingRequests and handleFriendRequest functions
 import User from '../models/User'
 import Connection from '../models/Connection'
-
+import { AuthContext } from '../context/AuthContext';
 const ConnectionsScreen = () => {
-  let { styles } = determineGlobalStyles();
+  const {darkMode} = useContext(AuthContext)
+  let { styles } = determineGlobalStyles(darkMode);
   const [view, setView] = useState('myConnections');  
 
   //Print the friends for testing and double checking connections work

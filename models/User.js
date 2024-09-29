@@ -89,12 +89,12 @@ class User {
       return;
     }
       //Print the length of the friends array
-      console.log("Current friends array " + friends.length)
+      // console.log("Current friends array " + friends.length)
     // Fetch details for each friend (friends may be stored as pointers or objects)
     for (let friendPointer of friends) {
       try {
         const friend = await friendPointer.fetch(); // Fetch the actual user object
-        console.log(`Friend: ${friend.get('username')}, Email: ${friend.get('email')}`);
+        // console.log(`Friend: ${friend.get('username')}, Email: ${friend.get('email')}`);
       } catch (error) {
         console.error('Error fetching friend details:', error);
       }

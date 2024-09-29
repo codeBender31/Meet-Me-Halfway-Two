@@ -1,9 +1,14 @@
 //This modal will display any meeting objects that have been stored in the database and already sent out through sms
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import Parse from 'parse/react-native.js';
+import { AuthContext } from '../context/AuthContext';
+import { determineGlobalStyles } from './Styles';
 
 const ScheduledMeetings = () => {
+const {darkMode} = useContext(AuthContext)
+const {styles} = determineGlobalStyles(darkMode)
+
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,12 +44,12 @@ const ScheduledMeetings = () => {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <ActivityIndicator size="large" color = {styles.activityIndicatorColor} />;
   }
 
   return (
-    <View>
-      <Text>Scheduled Meetings</Text>
+    <View style={styles.container}>
+      <Text style={styles.largeText}>Scheduled Meetings</Text>
       {meetings.length > 0 ? (
         <FlatList
           data={meetings}
@@ -60,11 +65,11 @@ const ScheduledMeetings = () => {
             const otherUser = user1.id === Parse.User.current().id ? user2 : user1;
 
             return (
-              <View style={{ padding: 10, borderBottomWidth: 1 }}>
-                <Text>Meeting with: {otherUser.get('username')}</Text>
-                <Text>Location: {location}</Text>
-                <Text>Date: {date}</Text>
-                <Text>Time: {time}</Text>
+              <View style={styles.meetingItem}>
+                <Text style={styles.meetingText}>Meeting with: {otherUser.get('username')}</Text>
+                <Text style={styles.meetingText}>Location: {location}</Text>
+                <Text style={styles.meetingText}>Date: {date}</Text>
+                <Text style={styles.meetingText}>Time: {time}</Text>
               </View>
             );
           }}

@@ -7,8 +7,9 @@ import { determineGlobalStyles } from '../components/Styles';
 import { AuthContext } from '../context/AuthContext'; 
 
 export default function LoadingScreen({ navigation }) {
-  const { styles, determinedLogo } = determineGlobalStyles();
-  const { user } = useContext(AuthContext);
+
+  const { user, darkMode } = useContext(AuthContext);
+  const { styles, determinedLogo } = determineGlobalStyles(darkMode);
 
   useEffect(() => {
     const timeout = setTimeout(() => {

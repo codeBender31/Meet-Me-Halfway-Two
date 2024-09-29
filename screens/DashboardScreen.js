@@ -1,6 +1,6 @@
 //This will be the original dashboard where users find midway points based on preferences
 //Will try to maintain original dashboard 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,10 +10,12 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import Map from './Map'; 
 import { determineGlobalStyles } from '../components/Styles';
 import { createMeeting, openGoogleMaps } from '../models/Meeting'; 
+import { AuthContext } from '../context/AuthContext';
 
 const DashboardScreen = () => {
+  const {darkMode} = useContext(AuthContext)
   //Determine the styling for the dashboard 
-  let { styles } = determineGlobalStyles();
+  let { styles } = determineGlobalStyles(darkMode);
   //Set the username 
   const [username, setUsername] = useState('');
   //Set the user1 address 
@@ -31,10 +33,26 @@ const DashboardScreen = () => {
   const [friends, setFriends] = useState([]);
   //Set the midpoint address for the meeting object 
   const [midpointAddress, setMidpointAddress] = useState('');
+    //Method to set the time for the meeting object
+    const formatCurrentTime = (date) => {
+      //Define the hours 
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      let dayOrNight = hours >= 12 ? 'PM' : 'AM';
+  
+      //Convert to 12 hour format 
+      hours = hours % 12
+      //Incase hours is equal to 0 then set it to 12 or mid day 
+      hours = hours ? hours : 12 ;
+      //Add a zero if needed 
+      let formattedTime = minutes  < 10 ? `0${minutes}` : minutes; 
+  
+      return `${hours}:${formattedTime} ${dayOrNight}`;
+    };
   //Current time 
   const [time, setTime] = useState(formatCurrentTime(new Date()));
   //Current date 
-  const [date, setDate] = useState(new Date());us
+  const [date, setDate] = useState(new Date());
   const navigation = useNavigation();
 
  
@@ -45,7 +63,7 @@ const DashboardScreen = () => {
         setUsername(currentUser.getUsername());
 
         const friendsArray = currentUser.get('friends') || []; 
-        console.log(friendsArray)
+        // console.log(friendsArray)
         setFriends(friendsArray); 
       }
     };
@@ -90,23 +108,6 @@ const DashboardScreen = () => {
       console.error('Error reverse geocoding:', error);
       return 'Error retrieving address';
     }
-  };
-
-  //Method to set the time for the meeting object
-  const formatCurrentTime = (date) => {
-    //Define the hours 
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let dayOrNight = hours >= 12 ? 'PM' : 'AM';
-
-    //Convert to 12 hour format 
-    hours = hours % 12
-    //Incase hours is equal to 0 then set it to 12 or mid day 
-    hours = hours ? hours : 12 ;
-    //Add a zero if needed 
-    let formattedTime = minutes  < 10 ? `0${minutes}` : minutes; 
-
-    return `${hours}:${formattedTime} ${dayOrNight}`;
   };
 
   //Method to create the meeting object that will be sent out 
@@ -218,17 +219,17 @@ const DashboardScreen = () => {
         <Picker
   selectedValue={selectedFriend ? selectedFriend.id : null}  // Set selectedValue to the friend's ID
   onValueChange={(itemValue) => {
-    console.log("Picker change event triggered. Selected friend ID:", itemValue);  // Log selected friend ID
+    // console.log("Picker change event triggered. Selected friend ID:", itemValue);  // Log selected friend ID
 
     // Find the selected friend object based on the selected ID
     const selected = friends.find(friend => friend.id === itemValue);
     setSelectedFriend(selected);  // Set the full selected friend object in state
-    console.log("Selected friend object:", selected);  // Log the full selected friend object
+    // console.log("Selected friend object:", selected);  // Log the full selected friend object
   }}
   style={localStyles.picker}
 >
   {friends.map((friend, index) => {
-    console.log(friend);  // Log each friend object to inspect structure
+    // console.log(friend);  // Log each friend object to inspect structure
     return <Picker.Item key={index} label={friend.get('username')} value={friend.id} />;  // Use friend.id as the value
   })}
 </Picker>
@@ -258,16 +259,16 @@ const DashboardScreen = () => {
     // console.log(selectedFriend)
     if (midpoint && selectedFriend) {
       const currentUser = Parse.User.current();
-      console.log("CurrentUser " + currentUser)
+      // console.log("CurrentUser " + currentUser)
       const coordinates = midpoint;
-      console.log("Coordinates " + coordinates)
+      // console.log("Coordinates " + coordinates)
       const location = midpointAddress;
-      console.log("Address " + midpointAddress)
+      // console.log("Address " + midpointAddress)
       const user1Id = currentUser.id;
-      console.log("User1 " + user1Id)
+      // console.log("User1 " + user1Id)
       const user2Id = selectedFriend.id;
-      console.log(selectedFriend.name)
-      console.log("User2 " + user2Id)
+      // console.log(selectedFriend.name)
+      // console.log("User2 " + user2Id)
 
       // Call createMeeting with necessary parameters
       createMeeting(user1Id, user2Id, location, coordinates, time, date)

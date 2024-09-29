@@ -1,6 +1,6 @@
 //Side Menu components and icons
 //Here is where you will add any new pages when users are logged in
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 //Import the icons for the side menu 
@@ -12,8 +12,10 @@ import { AuthContext } from '../context/AuthContext';
 import { determineGlobalStyles } from '../components/Styles'; 
 
 const SideMenu = (props) => {
+//Determine if dark or light mode
+const {darkMode} = useContext(AuthContext)
 //Get the style sheet 
-let {styles} = determineGlobalStyles()
+let {styles} = determineGlobalStyles(darkMode)
 //Make sure the user is logged in
 //Obtain their username 
   const currentUser = Parse.User.current();

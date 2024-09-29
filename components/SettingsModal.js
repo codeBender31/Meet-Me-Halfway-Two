@@ -1,11 +1,16 @@
 //This will be the settings modal for dark mode, notifications, profile pic, etc.
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Switch, TextInput, StyleSheet } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, TouchableOpacity, Switch, TextInput, StyleSheet, ScrollView } from 'react-native';
+import {AuthContext} from '../context/AuthContext'
+import { determineGlobalStyles } from './Styles';
 
 const SettingsScreen = () => {
   //Set the states that will be controlled in the page 
   //They are only placeholders for now 
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // const [darkMode, setDarkMode] = useState(false);
+  let {darkMode, toggleDarkMode} = useContext(AuthContext);
+  const {styles} = determineGlobalStyles(darkMode);
+
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState('English');
@@ -18,22 +23,24 @@ const SettingsScreen = () => {
   const languages = ['English', 'Spanish', 'French'];
   const fonts = ['Default', 'Serif', 'Sans-serif', 'Monospace'];
 
-//Create the dark mode/light mode toggle
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+// //Create the dark mode/light mode toggle
+//   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 //Create the notifications toggle 
   const toggleNotifications = () => setIsNotificationsEnabled(!isNotificationsEnabled);
 //Create the toggle for the location 
   const toggleLocation = () => setIsLocationEnabled(!isLocationEnabled);
 
   return (
-    <View style={styles.container}>
+    // <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <View style = {styles.scrollContainer}>
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>Dark Mode</Text>
-        {/*Declare the switch for the light/dark mode */}
-        <Switch
-          value={isDarkMode}
-          onValueChange={toggleDarkMode}
-        />
+      <Switch
+  value={darkMode}
+  onValueChange={(value) => {
+    toggleDarkMode(value); // Ensure toggleDarkMode gets the new value
+    console.log('Switch toggled: ', value); // Debugging output to ensure it's toggling
+    }}/>
       </View>
 
       <View style={styles.settingItem}>
@@ -128,58 +135,59 @@ const SettingsScreen = () => {
         {/*Since this is a second version*/}
         <Text style={styles.versionText}>2.0.0</Text>
       </View>
-    </View>
+      </View>
+
   );
 };
-//Temporary styling 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f9f9f9',
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  settingText: {
-    fontSize: 18,
-  },
-  languageSelector: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  languageButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginHorizontal: 5,
-    backgroundColor: '#ddd',
-    borderRadius: 20,
-  },
-  activeButton: {
-    backgroundColor: '#007BFF',
-  },
-  languageText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  versionText: {
-    fontSize: 16,
-    color: '#777',
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: '#fff',
-  },
-});
+// //Temporary styling 
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 20,
+//     backgroundColor: '#f9f9f9',
+//   },
+//   settingItem: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     paddingVertical: 15,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#ccc',
+//   },
+//   settingText: {
+//     fontSize: 18,
+//   },
+//   languageSelector: {
+//     flexDirection: 'row',
+//     justifyContent: 'flex-end',
+//   },
+//   languageButton: {
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     marginHorizontal: 5,
+//     backgroundColor: '#ddd',
+//     borderRadius: 20,
+//   },
+//   activeButton: {
+//     backgroundColor: '#007BFF',
+//   },
+//   languageText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//   },
+//   versionText: {
+//     fontSize: 16,
+//     color: '#777',
+//   },
+//   input: {
+//     flex: 1,
+//     borderWidth: 1,
+//     borderColor: '#ccc',
+//     borderRadius: 5,
+//     paddingHorizontal: 10,
+//     paddingVertical: 5,
+//     backgroundColor: '#fff',
+//   },
+// });
 
 export default SettingsScreen;
