@@ -26,8 +26,6 @@ const LoginScreen = () => {
       Alert.alert("Error", "Please enter both username and password.");
       return;
     }
-
-    // Start loading
     setLoading(true);
 
     try {
