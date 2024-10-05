@@ -26,16 +26,20 @@ export const AuthProvider = ({ children }) => {
     checkUser();
   }, []);
 //Login method to peek at who is logging in 
-  const login = async (username, password) => {
-    try {
-      const loggedInUser = await Parse.User.logIn(username, password);
-      setUser(loggedInUser);
-      return loggedInUser;
-    } catch (error) {
-      console.error("Failed to log in", error);
-      return null;
-    }
-  };
+const login = async (username, password) => {
+  try {
+    // Attempt login with Parse
+    const loggedInUser = await Parse.User.logIn(username, password);
+    // If login succeeds, store the user object
+    setUser(loggedInUser);
+    return loggedInUser;
+  } catch (error) {
+    // Handle invalid login
+    console.error("Failed to log in: ", error.message);
+    throw new Error("Invalid username or password. Please try again.");
+  }
+};
+
 //Logout to keep track of when the user logged out 
   const logout = async () => {
     await Parse.User.logOut();

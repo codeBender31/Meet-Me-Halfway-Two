@@ -21,23 +21,32 @@ const LoginScreen = () => {
   const { login } = useContext(AuthContext); 
 //Async method to login the user, establish object id and session
   const handleLogin = async () => {
-    //Start loading 
+    // Ensure username and password fields are filled (just to be safe)
+    if (!username || !password) {
+      Alert.alert("Error", "Please enter both username and password.");
+      return;
+    }
     setLoading(true);
+
     try {
-      await login(username, password); 
-      setLoading(false);
-      //This will serve as a double check for logging in
-      Alert.alert("Success!", "You are logged in successfully.");
-      //Set a delay to showcase the loading icon 
-      setTimeout(() => {
-        navigation.navigate('Main');
-      }, 500);
+      // Call the login function
+      const loggedInUser = await login(username, password);
+      
+      // If user is successfully logged in, proceed
+      if (loggedInUser) {
+        setLoading(false);
+        Alert.alert("Success!", "You are logged in successfully.");
+        setTimeout(() => {
+          navigation.navigate('Main');
+        }, 500);
+      }
     } catch (error) {
-      //End loading
+      // Handle failed login attempt
       setLoading(false);
-      Alert.alert("Login Failed", error.message, [{ text: "OK" }]);
+      Alert.alert("Login Failed", error.message || "An error occurred. Please check your credentials.");
     }
   };
+
 
   return (
     //To hide the keyboard as we move down the page 
