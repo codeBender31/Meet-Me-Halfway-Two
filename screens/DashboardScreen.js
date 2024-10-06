@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import Parse from 'parse/react-native.js';
@@ -7,7 +7,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Map from './Map'; 
 import { determineGlobalStyles } from '../components/Styles';
-import { createMeeting, openGoogleMaps } from '../models/Meeting'; 
+import { createMeeting, openGoogleMaps } from '../models/Meeting';
 
 const DashboardScreen = () => {
   let { styles } = determineGlobalStyles();
@@ -23,7 +23,11 @@ const DashboardScreen = () => {
   const [midpointAddress, setMidpointAddress] = useState('');
   const [time, setTime] = useState('12:00 PM');
   const [date, setDate] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(false); // For loading states
 
+  const mapRef = useRef(null);
+  const scrollViewRef = useRef(null);
+  
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -32,9 +36,8 @@ const DashboardScreen = () => {
       if (currentUser) {
         setUsername(currentUser.getUsername());
 
-        const friendsArray = currentUser.get('friends') || []; 
-        console.log(friendsArray);
-        setFriends(friendsArray); 
+        const friendsArray = currentUser.get('friends') || [];
+        setFriends(friendsArray);
       }
     };
     fetchFriends();
@@ -68,7 +71,7 @@ const DashboardScreen = () => {
 
   const reverseGeocodeMidpoint = async (lat, lng) => {
     try {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=YOUR_GOOGLE_API_KEY`);
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc`);
       const data = await response.json();
       return data.results[0]?.formatted_address || 'Address not found';
     } catch (error) {
@@ -100,6 +103,7 @@ const DashboardScreen = () => {
 
   const findMeetingPoint = async () => {
     if (userAddress && friendAddress) {
+      setIsLoading(true); // Start loading
       const userLocation = userAddress.geometry.location;
       const friendLocation = friendAddress.geometry.location;
       const midpointCoordinates = calculateMidpoint(userLocation, friendLocation);
@@ -109,59 +113,74 @@ const DashboardScreen = () => {
       setMidpointAddress(address);
 
       Alert.alert('Midpoint Details', `Coordinates: ${midpointCoordinates.lat}, ${midpointCoordinates.lng}\nAddress: ${address}`);
+      setIsLoading(false); // Stop loading
     } else {
       Alert.alert('Error', 'Please set both user and friend locations.');
     }
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <Text style={styles.largeText}>Welcome, {username}!</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+    >
+      <ScrollView 
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps="always"
+        style={styles.scrollView}
+      >
+        <View style={styles.container}>
+          <Text style={styles.largeText}>Welcome, {username}!</Text>
 
-        <View style={styles.midwayContainer}>
-          <Text style={styles.midwayText}>Find Midway Point</Text>
+          <View style={styles.midwayContainer}>
+            <Text style={styles.midwayText}>Find Midway Point</Text>
 
-          <GooglePlacesAutocomplete
-            placeholder="Enter User Address"
-            onPress={(data, details = null) => setSelectedUserAddress(details)}
-            query={{
-              key: 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc',
-              language: 'en',
-              components: 'country:us',
-              types: 'address',
-            }}
-            fetchDetails={true}
-            styles={autocompleteStyles}
-          />
+            <GooglePlacesAutocomplete
+              placeholder="Enter User Address"
+              onPress={(data, details = null) => setSelectedUserAddress(details)}
+              query={{
+                key: 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc',
+                language: 'en',
+                components: 'country:us',
+                types: 'address',
+              }}
+              fetchDetails={true}
+              styles={autocompleteStyles}
+              textInputProps={{
+                onSubmitEditing: Keyboard.dismiss,
+              }}
+            />
 
-          <TouchableOpacity
-            style={styles.bigButton}
-            onPress={() => {
-              if (selectedUserAddress) {
-                setUserAddress(selectedUserAddress);
-              } else {
-                Alert.alert('Error', 'Please select a user address.');
-              }
-            }}
-          >
-            <Text style={styles.bigButtonText}>Set User Location</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.bigButton}
+              onPress={() => {
+                if (selectedUserAddress) {
+                  setUserAddress(selectedUserAddress);
+                } else {
+                  Alert.alert('Error', 'Please select a user address.');
+                }
+              }}
+            >
+              <Text style={styles.bigButtonText}>Set User Location</Text>
+            </TouchableOpacity>
 
-          <GooglePlacesAutocomplete
-            placeholder="Enter Friend's Address"
-            onPress={(data, details = null) => setSelectedFriendAddress(details)}
-            query={{
-              key: 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc',
-              language: 'en',
-              components: 'country:us',
-              types: 'address',
-            }}
-            fetchDetails={true}
-            styles={autocompleteStyles}
-          />
+            <GooglePlacesAutocomplete
+              placeholder="Enter Friend's Address"
+              onPress={(data, details = null) => setSelectedFriendAddress(details)}
+              query={{
+                key: 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc',
+                language: 'en',
+                components: 'country:us',
+                types: 'address',
+              }}
+              fetchDetails={true}
+              styles={autocompleteStyles}
+              textInputProps={{
+                onSubmitEditing: Keyboard.dismiss,
+              }}
+            />
 
-          <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.bigButton}
               onPress={() => {
@@ -174,84 +193,63 @@ const DashboardScreen = () => {
             >
               <Text style={styles.bigButtonText}>Set Friend's Location</Text>
             </TouchableOpacity>
-          </View>
 
-          <View style={{ flex:1}}>
-            < Map userAddress={userAddress} friendAddress={friendAddress} midpoint={midpoint} />
-          </View>
+            <View style={{ height: 300, marginVertical: 20 }}>
+              <Map
+                userAddress={userAddress}
+                friendAddress={friendAddress}
+                midpoint={midpoint}
+                ref={mapRef}
+              />
+            </View>
 
-          <View>
             <Picker
               selectedValue={selectedFriend ? selectedFriend.id : null}
               onValueChange={(itemValue) => {
-                console.log("Picker change event triggered. Selected friend ID:", itemValue);
-
                 const selected = friends.find(friend => friend.id === itemValue);
                 setSelectedFriend(selected);
-                console.log("Selected friend object:", selected);
               }}
               style={localStyles.picker}
             >
-              {friends.map((friend, index) => {
-                console.log(friend);
-                return <Picker.Item key={index} label={friend.get('username')} value={friend.id} />;
-              })}
+              {friends.map((friend, index) => (
+                <Picker.Item key={index} label={friend.get('username')} value={friend.id} />
+              ))}
             </Picker>
-          </View>
-          <View style={styles.bottomButtons}>
-            <TouchableOpacity
-              style={styles.bigButton}
-              onPress={findMeetingPoint}
-            >
-              <Text style={styles.bigButtonText}>Find Meeting Point</Text>
-            </TouchableOpacity>
 
-            {midpoint && (
-              <TouchableOpacity
-                style={styles.bigButton}
-                onPress={() => openGoogleMaps(midpoint.lat, midpoint.lng)}
-              >
-                <Text style={styles.bigButtonText}>Open in Google Maps</Text>
-              </TouchableOpacity>
+            {isLoading && (
+              <View style={styles.loadingOverlay}>
+                <ActivityIndicator size="large" color="#0d9488" />
+              </View>
             )}
 
-            <TouchableOpacity
-              style={styles.bigButton}
-              onPress={() => {
-                if (midpoint && selectedFriend) {
-                  const currentUser = Parse.User.current();
-                  console.log("CurrentUser " + currentUser);
-                  const coordinates = midpoint;
-                  console.log("Coordinates " + coordinates);
-                  const location = midpointAddress;
-                  console.log("Address " + midpointAddress);
-                  const user1Id = currentUser.id;
-                  console.log("User1 " + user1Id);
-                  const user2Id = selectedFriend.id;
-                  console.log(selectedFriend.name);
-                  console.log("User2 " + user2Id);
+            <View style={styles.bottomButtons}>
+              <TouchableOpacity
+                style={styles.bigButton}
+                onPress={findMeetingPoint}
+              >
+                <Text style={styles.bigButtonText}>Find Meeting Point</Text>
+              </TouchableOpacity>
 
-                  createMeeting(user1Id, user2Id, location, coordinates, time, date)
-                    .then(() => {
-                      Alert.alert('Meeting created successfully!');
-                    })
-                    .catch((error) => {
-                      console.error('Error creating meeting:', error);
-                      Alert.alert('Error', 'Failed to create meeting. Please try again.');
-                    });
-                } else {
-                  Alert.alert('Error', 'Please select a friend and find the midpoint first.');
-                }
-              }}
-            >
-              <Text style={styles.bigButtonText}>Create Meeting</Text>
-            </TouchableOpacity>
+              {midpoint && (
+                <TouchableOpacity
+                  style={styles.bigButton}
+                  onPress={() => openGoogleMaps(midpoint.lat, midpoint.lng)}
+                >
+                  <Text style={styles.bigButtonText}>Open in Google Maps</Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={styles.bigButton}
+                onPress={handleCreateMeeting}
+              >
+                <Text style={styles.bigButtonText}>Create Meeting</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-
-
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -285,13 +283,17 @@ const autocompleteStyles = {
 
 const localStyles = StyleSheet.create({
   picker: {
-    height: 50,  
+    height: 50,
     width: '100%',
   },
   scrollView: {
     paddingVertical: 10, // Provide space to scroll content
   },
-
+  loadingOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default DashboardScreen;
