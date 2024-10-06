@@ -9,10 +9,11 @@ export const determineGlobalStyles = (darkMode) => {
 // let deviceColor = 'dark'
 // const { darkMode } = useContext(AuthContext);
 
-
+ 
   const colorPalette = {
     light: {
       background: '#A1C6EA',
+      // background: '#DAE3E5',
       text: '#000',
       buttonBackground: '#fff',
       buttonText: '#075985',
@@ -217,6 +218,7 @@ export const determineGlobalStyles = (darkMode) => {
       flexGrow: 1,
       padding: 20,
       backgroundColor: colors.background,
+      // backgroundColor: 'white',
     },
     sectionHeader: {
       marginVertical: 10,

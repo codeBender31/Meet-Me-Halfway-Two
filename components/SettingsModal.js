@@ -94,7 +94,7 @@ const SettingsScreen = () => {
         />
       </View>
 
-      <View style={styles.settingItem}>
+      {/* <View style={styles.settingItem}>
         <Text style={styles.settingText}>Font Type</Text>
         <View style={styles.languageSelector}>
           {fonts.map((font) => (
@@ -110,9 +110,9 @@ const SettingsScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
-      </View>
+      </View> */}
 
-      <View style={styles.settingItem}>
+      {/* <View style={styles.settingItem}>
         <Text style={styles.settingText}>Language</Text>
         <View style={styles.languageSelector}>
           {languages.map((language) => (
@@ -128,7 +128,7 @@ const SettingsScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
-      </View>
+      </View> */}
 
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>App Version</Text>

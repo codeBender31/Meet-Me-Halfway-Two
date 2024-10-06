@@ -329,12 +329,14 @@ const localStyles = StyleSheet.create({
   picker: {
     height: 50,  
     width: '100%',
-    // borderColor: '#ccc',
-    // borderWidth: 1,
-    // borderRadius: 8,
-    // marginVertical: 10,
-    // backgroundColor: '#f8f8f8',  
-    // color: '#000', 
+    backgroundColor: 'white',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginVertical: 10,
+    backgroundColor: '#f8f8f8',  
+    color: '#000', 
+    text: 'black',
   },
 });
 export default DashboardScreen;

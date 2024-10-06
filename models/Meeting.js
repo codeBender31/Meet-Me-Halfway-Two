@@ -44,20 +44,27 @@ const openGoogleMaps = (latitude, longitude) => {
   Linking.openURL(url).catch(err => console.error('Error opening Google Maps:', err));
 };
 
+//Helper function to correctly format the phone number 
+const formatNumbers = (phoneNumber) => {
+const UScode = '1'
+return `+${UScode}${phoneNumber}`
+};
+
 //Methdo to send the meeting object via sms 
 const sendMeetingNotificationViaTwilio = async (user1, user2, meeting) => {
   //Define the twilio api necessary info 
   //Twilio sid 
-  const TWILIO_SID = 'twilio_sid';
+  const TWILIO_SID = 'ACc9e5ba46f556939d783038cc0cb69cb2';
   //Twilio auth token
-  const TWILIO_AUTH_TOKEN = 'twilio_auth_token';
+  const TWILIO_AUTH_TOKEN = 'fe385249d46e6d927614ba7b26b181f8';
   //Twilio phone number 
-  const TWILIO_PHONE_NUMBER = 'twilio_phone_number';
+  const TWILIO_PHONE_NUMBER = '+18447553198';
 //Get the username of user1 and user 2
   const messageBody = `Meeting set between ${user1.get('username')} and ${user2.get('username')} at ${meeting.get('location')} on ${meeting.get('date')} at ${meeting.get('time')}.`;
 //Send the sms 
   const sendSms = async (to, body) => {
     try {
+      const formattedPhoneNumber = formatNumbers(to);
       const response = await axios.post(
         `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`,
         new URLSearchParams({
@@ -65,7 +72,7 @@ const sendMeetingNotificationViaTwilio = async (user1, user2, meeting) => {
           //twilio #
           From: TWILIO_PHONE_NUMBER,
           //to both users 
-          To: to,
+          To: formattedPhoneNumber,
           //The body of the message 
           Body: body,
         }),
