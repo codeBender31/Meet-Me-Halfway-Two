@@ -36,6 +36,8 @@ export const determineGlobalStyles = (darkMode) => {
       inputBorder: '#ccc',
       versionTextColor: '#777',
       settingItemBorderColor: '#e0e0e0',
+      disabledButtonBackground: '#d3d3d3',  // Greyed-out button color
+      disabledButtonText: '#aaa',  // Disabled text color
     },
     dark: {
       background: '#04080F',
@@ -61,6 +63,8 @@ export const determineGlobalStyles = (darkMode) => {
       inputBorder: '#555',
       versionTextColor: '#bbb',
       settingItemBorderColor: '#555',
+      disabledButtonBackground: '#555',  // Dark grey for disabled button
+      disabledButtonText: '#888',
     },
   };
 
@@ -104,17 +108,24 @@ export const determineGlobalStyles = (darkMode) => {
       width: '80%',
       paddingVertical: 12,
       marginVertical: 10,
-      borderRadius: 25, 
+      borderRadius: 25,
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 2,
       borderColor: colors.border,
       backgroundColor: colors.buttonBackground,
     },
+    disabledButton: {
+      backgroundColor: colors.disabledButtonBackground,
+      borderColor: colors.border,
+    },
     bigButtonText: {
       fontSize: 18,
       fontWeight: 'bold',
       color: colors.buttonText,
+    },
+    disabledButtonText: {
+      color: colors.disabledButtonText,
     },
     screenText: {
       color: colors.text,
@@ -274,30 +285,31 @@ export const determineGlobalStyles = (darkMode) => {
       fontSize: 16,
       color: colors.versionText,
     },
-    input: {
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 5,
-      paddingHorizontal: 10,
-      paddingVertical: 10,
-      backgroundColor: colors.inputBackground,
-      marginTop: 10,
-      fontSize: 16,
-      color: colors.inputText,
-    },
-    submitButton: {
-      backgroundColor: colors.buttonBackground,
-      paddingVertical: 10,
-      paddingHorizontal: 15,
-      borderRadius: 5,
-      alignItems: 'center',
-      marginTop: 10,
-    },
-    submitButtonText: {
-      color: colors.buttonText,
-      fontSize: 16,
-      fontWeight: 'bold',
-    },
+    // input: {
+    //   borderWidth: 1,
+    //   borderColor: colors.border,
+    //   width: '100%',
+    //   borderRadius: 5,
+    //   paddingHorizontal: 10,
+    //   paddingVertical: 10,
+    //   backgroundColor: colors.inputBackground,
+    //   marginTop: 10,
+    //   fontSize: 16,
+    //   color: colors.inputText,
+    // },
+    // submitButton: {
+    //   backgroundColor: colors.buttonBackground,
+    //   paddingVertical: 10,
+    //   paddingHorizontal: 15,
+    //   borderRadius: 5,
+    //   alignItems: 'center',
+    //   marginTop: 10,
+    // },
+    // submitButtonText: {
+    //   color: colors.buttonText,
+    //   fontSize: 16,
+    //   fontWeight: 'bold',
+    // },
       
   });
 
