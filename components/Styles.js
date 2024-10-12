@@ -125,6 +125,8 @@ export const determineGlobalStyles = (darkMode) => {
       color: colors.buttonText,
     },
     disabledButtonText: {
+      fontSize: 18,
+      fontWeight: 'bold',
       color: colors.disabledButtonText,
     },
     screenText: {
