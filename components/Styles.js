@@ -12,12 +12,13 @@ export const determineGlobalStyles = (darkMode) => {
  
   const colorPalette = {
     light: {
-      background: '#A1C6EA',
-      // background: '#DAE3E5',
+      // background: '#A1C6EA',
+      background: '#DAE3E5',
       text: '#000',
-      buttonBackground: '#fff',
-      buttonText: '#075985',
-      border: '#0ea5e9',
+      // buttonBackground: '#fff',
+      buttonBackground: '#075985',
+      buttonText: '#fff',
+      // border: '#0ea5e9',
       inputBackground: '#fff',
       inputText: '#000',
       placeholderTextColor: '#888',
@@ -44,7 +45,7 @@ export const determineGlobalStyles = (darkMode) => {
       text: '#fff',
       buttonBackground: '#075985',
       buttonText: '#fff',
-      border: '#155e75',
+      // border: '#155e75',
       inputBackground: '#1c1c1c',
       inputText: '#fff',
       placeholderTextColor: '#bbb', 
@@ -112,7 +113,7 @@ export const determineGlobalStyles = (darkMode) => {
       justifyContent: 'center',
       alignItems: 'center',
       borderWidth: 2,
-      borderColor: colors.border,
+      // borderColor: colors.border,
       backgroundColor: colors.buttonBackground,
     },
     disabledButton: {
