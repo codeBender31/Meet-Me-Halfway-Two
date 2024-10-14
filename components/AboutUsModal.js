@@ -1,12 +1,13 @@
 //This will be the About us Page
 //Necessary imports 
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { determineGlobalStyles } from './Styles';
-
+import { AuthContext } from '../context/AuthContext';
 function AboutUsModal({ navigation }) {
+  const {darkMode} = useContext(AuthContext)
   //Inherit the styling from Styles.js
-  let { styles, determinedLogo } = determineGlobalStyles();
+  let { styles, determinedLogo } = determineGlobalStyles(darkMode);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

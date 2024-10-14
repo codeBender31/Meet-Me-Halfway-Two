@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+
+//This modal will display any meeting objects that have been stored in the database and already sent out through sms
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import Parse from 'parse/react-native.js';
+import { AuthContext } from '../context/AuthContext';
+import { determineGlobalStyles } from './Styles';
 
 const ScheduledMeetings = () => {
+const {darkMode} = useContext(AuthContext)
+const {styles} = determineGlobalStyles(darkMode)
+
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,16 +45,16 @@ const ScheduledMeetings = () => {
   }, []);
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007BFF" />
-      </View>
-    );
+
+    return <ActivityIndicator size="large" color = {styles.activityIndicatorColor} />;
+
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Scheduled Meetings</Text>
+
+      <Text style={styles.largeText}>Scheduled Meetings</Text>
+
       {meetings.length > 0 ? (
         <FlatList
           data={meetings}

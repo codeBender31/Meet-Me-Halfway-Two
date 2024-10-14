@@ -1,13 +1,15 @@
 //This will serve as the notifications modal accessible from the side menu
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { determineGlobalStyles } from '../components/Styles'; 
 //Import the backend components from Connection
 import { getPendingRequests, handleFriendRequest } from '../models/Connection'; 
+import { AuthContext } from '../context/AuthContext';
 
 const NotificationsModal = () => {
+const {darkMode} = useContext(AuthContext)
   //Inherit styling from Styles.js
-  let { styles } = determineGlobalStyles();
+  let { styles } = determineGlobalStyles(darkMode);
   //Show the connection requests from the backend
   const [showConnectionRequests, setShowConnectionRequests] = useState(true);
   //This was the place holder variable name, will delete and convert to showConnectionRequests once debugging is complete
