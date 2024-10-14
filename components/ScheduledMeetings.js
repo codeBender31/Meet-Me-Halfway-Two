@@ -1,3 +1,4 @@
+
 //This modal will display any meeting objects that have been stored in the database and already sent out through sms
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
@@ -44,12 +45,16 @@ const {styles} = determineGlobalStyles(darkMode)
   }, []);
 
   if (loading) {
+
     return <ActivityIndicator size="large" color = {styles.activityIndicatorColor} />;
+
   }
 
   return (
     <View style={styles.container}>
+
       <Text style={styles.largeText}>Scheduled Meetings</Text>
+
       {meetings.length > 0 ? (
         <FlatList
           data={meetings}
@@ -75,10 +80,48 @@ const {styles} = determineGlobalStyles(darkMode)
           }}
         />
       ) : (
-        <Text>No scheduled meetings found.</Text>
+        <Text style={styles.noDataText}>No scheduled meetings found.</Text>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f2f2f2',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+  },
+  meetingItem: {
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  meetingText: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 5,
+  },
+  noDataText: {
+    color: '#777',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+});
 
 export default ScheduledMeetings;

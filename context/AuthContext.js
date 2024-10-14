@@ -32,6 +32,7 @@ const[darkMode, setDarkMode] = useState(false);
     checkUser();
   }, []);
 //Login method to peek at who is logging in 
+
   const login = async (username, password) => {
     try {
       const loggedInUser = await Parse.User.logIn(username, password);
@@ -44,6 +45,7 @@ const[darkMode, setDarkMode] = useState(false);
       return null;
     }
   };
+
 //Logout to keep track of when the user logged out 
   const logout = async () => {
     await Parse.User.logOut();

@@ -48,14 +48,18 @@ function DrawerNavigator() {
       drawerContent={(props) => <SideMenu {...props} />}
       screenOptions={{
         headerStyle: {
-          backgroundColor: styles.container.backgroundColor,  
+          backgroundColor: '#0ea5e9',  
+
         },
         headerTintColor: styles.loadingText.color,  
         headerTitleStyle: {
           fontWeight: 'bold',
+          fontSize: 30,
+          paddingBottom: 20,
+
         },
         drawerStyle: {
-          backgroundColor: styles.container.backgroundColor,  
+          backgroundColor: styles.container.backgroundColorTopNav,  
           width: 240,
         },
         drawerActiveTintColor: styles.bigButtonText.color, 

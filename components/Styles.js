@@ -12,8 +12,10 @@ export const determineGlobalStyles = (darkMode) => {
  
   const colorPalette = {
     light: {
+
       // background: '#A1C6EA',
       background: '#DAE3E5',
+
       text: '#000',
       // buttonBackground: '#fff',
       buttonBackground: '#075985',
@@ -158,7 +160,7 @@ export const determineGlobalStyles = (darkMode) => {
         justifyContent: 'center',
         marginBottom: 20,
       },
-  
+
     switchButton: {
       padding: 10,
       backgroundColor: '#ddd',

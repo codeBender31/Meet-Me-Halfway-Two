@@ -30,12 +30,16 @@ const LoginScreen = () => {
   const { styles, determinedLogo } = determineGlobalStyles();
   const { login } = useContext(AuthContext); 
 //Async method to login the user, establish object id and session
+
   const handleLogin = async (values) => {
     //Separate the new values
     const {username, password} = values;
     //Start loading 
+
     setLoading(true);
+
     try {
+
       const loggedInUser = await Parse.User.logIn(username, password);
       setLoading(false);
       //This will serve as a double check for logging in
@@ -44,12 +48,14 @@ const LoginScreen = () => {
       setTimeout(() => {
         navigation.navigate('Main');
       }, 500);
+
     } catch (error) {
-      //End loading
+      // Handle failed login attempt
       setLoading(false);
-      Alert.alert("Login Failed", error.message, [{ text: "OK" }]);
+      Alert.alert("Login Failed", error.message || "An error occurred. Please check your credentials.");
     }
   };
+
 
   return (
     //To hide the keyboard as we move down the page 

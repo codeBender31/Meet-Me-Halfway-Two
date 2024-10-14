@@ -1,16 +1,16 @@
-//This will be register modal pop up when the user is registering with the option to return to the WelcomeScreen
 import React, { useState, useContext } from 'react';
 import { View, TextInput, ActivityIndicator, Image, TouchableOpacity, Alert, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { determineGlobalStyles } from '../components/Styles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 //Import the form validation
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 //Import the user class 
+
 import User from '../models/User';
 import Parse from 'parse/react-native.js';
-//Import this to keep track of the logged in user until they choose to log out 
 import { AuthContext } from '../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
@@ -26,47 +26,67 @@ const RegistrationSchema = Yup.object().shape({
 })
 
 const RegisterScreen = () => {
-  //Declare all the necessary fields to create a User object 
-  // const [firstName, setFirstName] = useState('');
-  // const [lastName, setLastName] = useState('');
-  // const [username, setUsername] = useState('');
-  // const [password, setPassword] = useState('');
-  // const [confirmPassword, setConfirmPassword] = useState('');
-  // const [email, setEmail] = useState('');
-  // const [phoneNumber,setPhoneNumber] = useState('');
-  //Declare any errors we may encounter when registering 
-  // const [error, setError] = useState(null);
+
   const [loading, setLoading] = useState(false); 
   const navigation = useNavigation();
-  //Inherit the styling from Styles.js 
   const { styles, determinedLogo } = determineGlobalStyles();
-  //Keep track of the user once they register so they wont need to log in again 
   const { login } = useContext(AuthContext); 
-// //Require all fields to be filled out 
-//   const validateForm = () => {
-//     if (!firstName || !lastName || !email || !phoneNumber || !password || !confirmPassword) {
-//       setError('All fields are required');
-//       return false;
-//     }//Check both password and confirmPassword match 
-//     if (password !== confirmPassword) {
-//       setError('Passwords do not match');
-//       return false;
-//     }
-//     return true;
-//   };
-  //To not let users double register we need to check if they exist in the parse database already 
+
   const checkIfUserExists = async (username, email) => {
+
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhoneNumber = (phoneNumber) => {
+    const phoneRegex = /^[0-9]{10}$/; // Simple validation for 10 digits
+    return phoneRegex.test(phoneNumber);
+  };
+
+  const validatePasswordStrength = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
+  const validateForm = () => {
+    if (!firstName || !lastName || !email || !phoneNumber || !password || !confirmPassword) {
+      setError('All fields are required');
+      return false;
+    }
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (!validatePhoneNumber(phoneNumber)) {
+      setError('Phone number must be 10 digits');
+      return false;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    if (!validatePasswordStrength(password)) {
+      setError('Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, and a number');
+      return false;
+    }
+    return true;
+  };
+
+  const checkIfUserExists = async () => {
+
     const query = new Parse.Query(Parse.User);
     query.equalTo('username', username);
     query.equalTo('email', email);
-  //Throwout appropriate error 
+
     try {
       const result = await query.first();
       if (result) {
         Alert.alert(
           "Registration Error",
           "User with this username or email already exists",
-          [{ text: "OK" }]//Button text from the alert 
+          [{ text: "OK" }]
         );
         return true;
       }
@@ -80,11 +100,13 @@ const RegisterScreen = () => {
       return true; 
     }
   };
+
 //If the user is not register then go ahead an register them and create a new user object 
   const handleRegister = async (values) => {
     const { firstName, lastName, phoneNumber, username, password, email } = values;
 
     // if (!validateForm()) return;
+
 
     setLoading(true); 
 
@@ -92,7 +114,7 @@ const RegisterScreen = () => {
       setLoading(false);
       return;
     }
-//Create the new user object 
+
     const newUser = new User();
     newUser.setFirstName(firstName);
     newUser.setLastName(lastName);
@@ -101,19 +123,17 @@ const RegisterScreen = () => {
     newUser.setPassword(password);
     newUser.setEmail(email);
    
-//Attempt to save in the database 
     try {
       await newUser.signUp();
       setLoading(false); 
       const loggedInUser = await login(username, password);
       if (loggedInUser) {
-       
         await AsyncStorage.setItem('sessionToken', loggedInUser.getSessionToken());
-        setTimeout(() => {//If successful then navigate to Main
+        setTimeout(() => {
           navigation.navigate('Main'); 
         }, 500);
       }
-    } catch (err) {//Catch the error otherwise 
+    } catch (err) {
       setError(err.message);
       setLoading(false); 
     }
@@ -127,6 +147,7 @@ const RegisterScreen = () => {
       extraHeight={150}
     >
       <Image source={determinedLogo} style={styles.logo} />
+
       {/*Here we set all the components for the input fields to make User objects */}
       <Formik
        initialValues={{
@@ -144,6 +165,7 @@ const RegisterScreen = () => {
 >
   {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isValid, dirty }) => (
     <View style={{ width: '100%' }}>
+
       <TextInput
         placeholder="First Name"
         style={styles.input}
@@ -160,11 +182,14 @@ const RegisterScreen = () => {
         onBlur={handleBlur('lastName')}
         value={values.lastName}
       />
+
       {touched.lastName && errors.lastName && <Text style={styles.error}>{errors.lastName}</Text>}
 
       <TextInput
+
         placeholder="Phone #"
         style={styles.input}
+
         keyboardType="phone-pad"
         onChangeText={handleChange('phoneNumber')}
         onBlur={handleBlur('phoneNumber')}
@@ -173,6 +198,7 @@ const RegisterScreen = () => {
       {touched.phoneNumber && errors.phoneNumber && <Text style={styles.error}>{errors.phoneNumber}</Text>}
 
       <TextInput
+
         placeholder="Email"
         style={styles.input}
         keyboardType="email-address"
@@ -211,6 +237,8 @@ const RegisterScreen = () => {
         value={values.confirmPassword}
       />
       {touched.confirmPassword && errors.confirmPassword && <Text style={styles.error}>{errors.confirmPassword}</Text>}
+
+
 
       {loading ? (
         <View style={styles.loadingOverlay}>

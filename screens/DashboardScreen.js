@@ -1,7 +1,9 @@
+
 //This will be the original dashboard where users find midway points based on preferences
 //Will try to maintain original dashboard 
 import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import Parse from 'parse/react-native.js';
@@ -9,8 +11,10 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Map from './Map'; 
 import { determineGlobalStyles } from '../components/Styles';
+
 import { createMeeting, openGoogleMaps } from '../models/Meeting'; 
 import { AuthContext } from '../context/AuthContext';
+
 
 const DashboardScreen = () => {
   const {darkMode} = useContext(AuthContext)
@@ -53,9 +57,10 @@ const DashboardScreen = () => {
   const [time, setTime] = useState(formatCurrentTime(new Date()));
   //Current date 
   const [date, setDate] = useState(new Date());
+
+
   const navigation = useNavigation();
 
- 
   useEffect(() => {
     const fetchFriends = async () => {
       const currentUser = Parse.User.current();
@@ -65,11 +70,11 @@ const DashboardScreen = () => {
         const friendsArray = currentUser.get('friends') || []; 
         // console.log(friendsArray)
         setFriends(friendsArray); 
+
       }
     };
     fetchFriends();
   }, []);
-
 
   useFocusEffect(
     useCallback(() => {
@@ -91,13 +96,11 @@ const DashboardScreen = () => {
     }, [navigation])
   );
 
-
   const calculateMidpoint = (location1, location2) => {
     const lat = (location1.lat + location2.lat) / 2;
     const lng = (location1.lng + location2.lng) / 2;
     return { lat, lng };
   };
-
 
   const reverseGeocodeMidpoint = async (lat, lng) => {
     try {
@@ -117,7 +120,6 @@ const DashboardScreen = () => {
       const coordinates = midpoint;
       const location = midpointAddress;
 
-      // Reuse the createMeeting method
       await createMeeting(
         currentUser.id,
         selectedFriend.id,
@@ -135,6 +137,7 @@ const DashboardScreen = () => {
 
   const findMeetingPoint = async () => {
     if (userAddress && friendAddress) {
+      setIsLoading(true); // Start loading
       const userLocation = userAddress.geometry.location;
       const friendLocation = friendAddress.geometry.location;
       const midpointCoordinates = calculateMidpoint(userLocation, friendLocation);
@@ -143,14 +146,15 @@ const DashboardScreen = () => {
       const address = await reverseGeocodeMidpoint(midpointCoordinates.lat, midpointCoordinates.lng);
       setMidpointAddress(address);
 
- 
       Alert.alert('Midpoint Details', `Coordinates: ${midpointCoordinates.lat}, ${midpointCoordinates.lng}\nAddress: ${address}`);
+      setIsLoading(false); // Stop loading
     } else {
       Alert.alert('Error', 'Please set both user and friend locations.');
     }
   };
 
   return (
+
     <View style={styles.container}>
       <Text style={styles.largeText}>Welcome, {username}!</Text>
 
@@ -293,15 +297,146 @@ const DashboardScreen = () => {
       
       </View>
     </View>
+
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+    >
+      <ScrollView 
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps="always"
+        style={styles.scrollView}
+      >
+        <View style={styles.container}>
+          <Text style={styles.largeText}>Welcome, {username}!</Text>
+
+          <View style={styles.midwayContainer}>
+            <Text style={styles.midwayText}>Find Midway Point</Text>
+
+            <GooglePlacesAutocomplete
+              placeholder="Enter User Address"
+              onPress={(data, details = null) => setSelectedUserAddress(details)}
+              query={{
+                key: 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc',
+                language: 'en',
+                components: 'country:us',
+                types: 'address',
+              }}
+              fetchDetails={true}
+              styles={autocompleteStyles}
+              textInputProps={{
+                onSubmitEditing: Keyboard.dismiss,
+              }}
+            />
+
+            <TouchableOpacity
+              style={styles.bigButton}
+              onPress={() => {
+                if (selectedUserAddress) {
+                  setUserAddress(selectedUserAddress);
+                } else {
+                  Alert.alert('Error', 'Please select a user address.');
+                }
+              }}
+            >
+              <Text style={styles.bigButtonText}>Set User Location</Text>
+            </TouchableOpacity>
+
+            <GooglePlacesAutocomplete
+              placeholder="Enter Friend's Address"
+              onPress={(data, details = null) => setSelectedFriendAddress(details)}
+              query={{
+                key: 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc',
+                language: 'en',
+                components: 'country:us',
+                types: 'address',
+              }}
+              fetchDetails={true}
+              styles={autocompleteStyles}
+              textInputProps={{
+                onSubmitEditing: Keyboard.dismiss,
+              }}
+            />
+
+            <TouchableOpacity
+              style={styles.bigButton}
+              onPress={() => {
+                if (selectedFriendAddress) {
+                  setFriendAddress(selectedFriendAddress);
+                } else {
+                  Alert.alert('Error', "Please select a friend's address.");
+                }
+              }}
+            >
+              <Text style={styles.bigButtonText}>Set Friend's Location</Text>
+            </TouchableOpacity>
+
+            <View style={{ height: 300, marginVertical: 20 }}>
+              <Map
+                userAddress={userAddress}
+                friendAddress={friendAddress}
+                midpoint={midpoint}
+                ref={mapRef}
+              />
+            </View>
+
+            <Picker
+              selectedValue={selectedFriend ? selectedFriend.id : null}
+              onValueChange={(itemValue) => {
+                const selected = friends.find(friend => friend.id === itemValue);
+                setSelectedFriend(selected);
+              }}
+              style={localStyles.picker}
+            >
+              {friends.map((friend, index) => (
+                <Picker.Item key={index} label={friend.get('username')} value={friend.id} />
+              ))}
+            </Picker>
+
+            {isLoading && (
+              <View style={styles.loadingOverlay}>
+                <ActivityIndicator size="large" color="#0d9488" />
+              </View>
+            )}
+
+            <View style={styles.bottomButtons}>
+              <TouchableOpacity
+                style={styles.bigButton}
+                onPress={findMeetingPoint}
+              >
+                <Text style={styles.bigButtonText}>Find Meeting Point</Text>
+              </TouchableOpacity>
+
+              {midpoint && (
+                <TouchableOpacity
+                  style={styles.bigButton}
+                  onPress={() => openGoogleMaps(midpoint.lat, midpoint.lng)}
+                >
+                  <Text style={styles.bigButtonText}>Open in Google Maps</Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={styles.bigButton}
+                onPress={handleCreateMeeting}
+              >
+                <Text style={styles.bigButtonText}>Create Meeting</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+
   );
 };
-
 
 const autocompleteStyles = {
   container: {
     flex: 0,
     width: '100%',
-    marginBottom: 10,
+    marginTop: 10,
   },
   textInputContainer: {
     width: '100%',
@@ -327,8 +462,9 @@ const autocompleteStyles = {
 
 const localStyles = StyleSheet.create({
   picker: {
-    height: 50,  
+    height: 50,
     width: '100%',
+
     backgroundColor: 'white',
     borderColor: '#ccc',
     borderWidth: 1,
@@ -337,6 +473,8 @@ const localStyles = StyleSheet.create({
     backgroundColor: '#f8f8f8',  
     color: '#000', 
     text: 'black',
+
   },
 });
+
 export default DashboardScreen;
