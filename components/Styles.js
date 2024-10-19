@@ -106,7 +106,7 @@ export const determineGlobalStyles = (darkMode) => {
       alignItems: 'center',
     },
     bigButton: {
-      width: '80%',
+      width: '100%',
       paddingVertical: 12,
       marginVertical: 10,
       borderRadius: 25,
@@ -134,9 +134,9 @@ export const determineGlobalStyles = (darkMode) => {
       color: colors.text,
       fontWeight: '500',
       marginTop: 10,
-      fontSize: 24,
+      fontSize: 20,
       textAlign: 'center',
-      padding: 25,
+      // padding: 25,
     },
     error: {
       color: 'red',
