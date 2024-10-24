@@ -6,42 +6,62 @@ import Parse from 'parse/react-native.js';
 //Create a variable to hold the connection obj class 
 const Connection = Parse.Object.extend("Connection");
 
-//Method to obtain the list of friends/connections
 const getMyConnections = async () => {
   const currentUser = Parse.User.current();
-  //We need to double check that a user is logged in first
-  //However once AuthContext works we can delete it 
+  
+  // Double-check that a user is logged in
   if (!currentUser) {
     console.error('No current user logged in!');
     return [];
   }
-//Define rest of the variables 
-//To see who is sending the connection we save it in the connection obj
+
+  // Define queries for sender and receiver roles
   const queryAsSender = new Parse.Query("Connection");
-  //Set the sender 
   queryAsSender.equalTo("sender", currentUser);
   queryAsSender.equalTo("status", "accepted");
-//Set the variable holding the query for the reciever 
+
   const queryAsReceiver = new Parse.Query("Connection");
-//Set the receiver 
   queryAsReceiver.equalTo("receiver", currentUser);
   queryAsReceiver.equalTo("status", "accepted");
 
-//Combine the queries to send it to Parse 
+  // Combine the queries to send to Parse
   const combinedQuery = Parse.Query.or(queryAsSender, queryAsReceiver);
-//Wait for async function to finish sending the combined query
+
   try {
+    // Wait for async function to finish sending the combined query
     const connections = await combinedQuery.find();
-    return connections.map((conn) => {
-      //This is to determine who is logged in as in who is the sender 
-      const otherUser = conn.get("sender").id === currentUser.id ? conn.get("receiver") : conn.get("sender");
-      return { id: otherUser.id, name: otherUser.get("username") };
-    });
+
+    // Use Promise.all to handle async operations inside the map
+    const completedConnections = await Promise.all(
+      connections.map(async (conn, index) => {
+        // Determine who the other user is
+        let otherUser = conn.get("sender").id === currentUser.id ? conn.get("receiver") : conn.get("sender");
+
+        // Retry mechanism to fix latency issues
+        if (!otherUser || typeof otherUser.get('username') === 'undefined') {
+          // Attempt to re-fetch the missing user data
+          try {
+            console.log(`Re-fetching user data for connection ${index + 1}...`);
+            const userQuery = new Parse.Query(Parse.User);
+            otherUser = await userQuery.get(otherUser.id);
+          } catch (error) {
+            console.error(`Error re-fetching user for connection ${index + 1}:`, error);
+            return { id: 'undefined', name: 'N/A' };
+          }
+        }
+
+        // Return the completed connection details
+        return { id: otherUser.id, name: otherUser.get('username') };
+      })
+    );
+
+    return completedConnections;
   } catch (error) {
     console.error('Error fetching connections:', error);
     return [];
   }
 };
+
 
 //To showcase all users from the database 
 const getAllUsers = async () => {
