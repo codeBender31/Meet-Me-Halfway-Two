@@ -154,23 +154,22 @@ const MidwayGuest = () => {
   style={[styles.bigButton, styles.useCurrentLocationButton]}
   onPress={async () => {
     try {
-      // Step 1: Request location permission
+   
       let { status } = await Location.requestForegroundPermissionsAsync();
       
-      // Step 2: Check if permission is granted
+    
       if (status !== 'granted') {
         // If permission is denied, show an alert and do nothing further
         Alert.alert('Permission denied', 'We need your permission to access location.');
         return; // Exit the function here
       }
 
-      // Step 3: Set loading to true since permission is granted and we are now fetching the location
       setLoading(true);
 
-      // Step 4: Get current location
+    
       let location = await Location.getCurrentPositionAsync({});
       
-      // Step 5: If location is obtained, update state with the coordinates
+     
       if (location) {
         const { latitude, longitude } = location.coords;
 
@@ -181,14 +180,14 @@ const MidwayGuest = () => {
           }
         };
         
-        // Step 6: Set the state to use these coordinates
+   
         setSelectedUserAddress(details);
         setUserAddress(details);
         // Alert.alert('Location set', `Your current location has been set.\nLatitude: ${details.geometry.location.lat}, Longitude: ${details.geometry.location.lng}`);
 
       }
     } catch (error) {
-      // Step 7: If any error occurs during the location fetching, handle it here
+      
       console.error('Error fetching location:', error);
       Alert.alert('Error', 'Could not fetch location. Please try again.');
     } finally {
