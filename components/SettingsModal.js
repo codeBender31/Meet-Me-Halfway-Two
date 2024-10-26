@@ -1,6 +1,6 @@
 //This will be the settings modal for dark mode, notifications, profile pic, etc.
 import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, Switch, TextInput, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Switch, TextInput, StyleSheet, ScrollView, Alert} from 'react-native';
 import {AuthContext} from '../context/AuthContext'
 import { determineGlobalStyles } from './Styles';
 
@@ -29,6 +29,95 @@ const SettingsScreen = () => {
   const toggleNotifications = () => setIsNotificationsEnabled(!isNotificationsEnabled);
 //Create the toggle for the location 
   const toggleLocation = () => setIsLocationEnabled(!isLocationEnabled);
+
+  //Helper function to change username
+    const handleChangeUsername = () => {
+      Alert.prompt(
+        'Change Username',
+        `Current username: ${username}`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: (newUsername) => {
+              if (newUsername) {
+                setUsername(newUsername);
+              }
+            },
+          },
+        ],
+        'plain-text'
+      );
+    };
+
+     // Function to change email
+  const handleChangeEmail = () => {
+    Alert.prompt(
+      'Change Email',
+      `Current email: ${email}`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: (newEmail) => {
+            if (newEmail) {
+              setEmail(newEmail);
+            }
+          },
+        },
+      ],
+      'plain-text'
+    );
+  };
+
+    // Function to change password
+    const handleChangePassword = () => {
+      Alert.prompt(
+        'Verify Old Password',
+        'Enter your current password',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Verify',
+            onPress: (oldPassword) => {
+              if (oldPassword === password) {
+                Alert.prompt(
+                  'Change Password',
+                  'Enter your new password',
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'OK',
+                      onPress: (newPassword) => {
+                        if (newPassword) {
+                          setPassword(newPassword);
+                        }
+                      },
+                    },
+                  ],
+                  'secure-text'
+                );
+              } else {
+                Alert.alert('Incorrect Password', 'The old password you entered is incorrect.');
+              }
+            },
+          },
+        ],
+        'secure-text'
+      );
+    };
 
   return (
     // <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -63,7 +152,14 @@ const SettingsScreen = () => {
              
       {/*For security purposes these cannot be this simple*/}
       {/*We need to set security measures for them */}
+
       <View style={styles.settingItem}>
+        {/* <Text style={styles.settingText}>Change Username</Text> */}
+        <TouchableOpacity onPress={handleChangeUsername} style={styles.bigButton}>
+          <Text style={styles.bigButtonText}>Change Username</Text>
+        </TouchableOpacity>
+      </View>
+      {/* <View style={styles.settingItem}>
         <Text style={styles.settingText}>Change Username</Text>
         <TextInput
           style={styles.input}
@@ -71,9 +167,14 @@ const SettingsScreen = () => {
           value={username}
           onChangeText={setUsername}
         />
+      </View> */}
+       <View style={styles.settingItem}>
+        {/* <Text style={styles.settingText}>Change Username</Text> */}
+        <TouchableOpacity onPress={handleChangePassword} style={styles.bigButton}>
+          <Text style={styles.bigButtonText}>Change Password</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.settingItem}>
+      {/* <View style={styles.settingItem}>
         <Text style={styles.settingText}>Change Password</Text>
         <TextInput
           style={styles.input}
@@ -82,9 +183,15 @@ const SettingsScreen = () => {
           secureTextEntry
           onChangeText={setPassword}
         />
-      </View>
+      </View> */}
 
       <View style={styles.settingItem}>
+        {/* <Text style={styles.settingText}>Change Username</Text> */}
+        <TouchableOpacity onPress={handleChangeEmail} style={styles.bigButton}>
+          <Text style={styles.bigButtonText}>Change Email</Text>
+        </TouchableOpacity>
+      </View>
+      {/* <View style={styles.settingItem}>
         <Text style={styles.settingText}>Change Email</Text>
         <TextInput
           style={styles.input}
@@ -92,7 +199,7 @@ const SettingsScreen = () => {
           value={email}
           onChangeText={setEmail}
         />
-      </View>
+      </View> */}
 
       {/* <View style={styles.settingItem}>
         <Text style={styles.settingText}>Font Type</Text>
@@ -133,7 +240,7 @@ const SettingsScreen = () => {
       <View style={styles.settingItem}>
         <Text style={styles.settingText}>App Version</Text>
         {/*Since this is a second version*/}
-        <Text style={styles.versionText}>2.0.0</Text>
+        <Text style={styles.settingText}>2.0.0</Text>
       </View>
       </View>
 

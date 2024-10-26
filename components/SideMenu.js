@@ -1,6 +1,6 @@
 //Side Menu components and icons
 //Here is where you will add any new pages when users are logged in
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 //Import the icons for the side menu 
@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Parse from 'parse/react-native.js';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext'; 
+import * as Notifications from 'expo-notifications';
 //Determined styling from Styles.js 
 import { determineGlobalStyles } from '../components/Styles'; 
 
@@ -15,13 +16,51 @@ const SideMenu = (props) => {
 //Determine if dark or light mode
 const {darkMode} = useContext(AuthContext)
 //Get the style sheet 
-let {styles} = determineGlobalStyles(darkMode)
+let {styles, determinedLogo} = determineGlobalStyles(darkMode)
 //Make sure the user is logged in
 //Obtain their username 
   const currentUser = Parse.User.current();
   //This is only for testing, will remove later 
   const username = currentUser ? currentUser.getUsername() : 'Guest';
   const navigation = useNavigation();
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
+
+  // Check for new notifications periodically
+  useEffect(() => {
+    const checkForNotifications = async () => {
+      const query = new Parse.Query('Notifications');
+      query.equalTo('receiver', currentUser);
+      query.equalTo('status', 'unread');
+      const newNotifications = await query.find();
+      if (newNotifications.length > 0) {
+        setHasNewNotifications(true);
+      } else {
+        setHasNewNotifications(false);
+      }
+    };
+
+    // Poll every 30 seconds
+    const interval = setInterval(() => {
+      checkForNotifications();
+    }, 30000);
+
+    // Initial check
+    checkForNotifications();
+
+    // Clean up the interval
+    return () => clearInterval(interval);
+  }, [currentUser]);
+
+  // Listen for push notifications
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      setHasNewNotifications(true);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 //Once they explicitly log out, show a delay and animation 
   const handleLogout = async () => {
     try {
@@ -57,12 +96,28 @@ let {styles} = determineGlobalStyles(darkMode)
 
       <DrawerItem
         icon={({ color, size }) => (
+          <Ionicons
+            name={hasNewNotifications ? 'notifications' : 'notifications-outline'}
+            size={size}
+            color={styles.drawerIconColor.color}
+          />
+        )}
+        label="Notifications"
+        labelStyle={styles.drawerLabel}
+        onPress={() => {
+          props.navigation.navigate('Notifications');
+          setHasNewNotifications(false); 
+        }}
+      />
+
+      {/* <DrawerItem
+        icon={({ color, size }) => (
           <Ionicons name="notifications-outline" size={size} color={styles.drawerIconColor.color} />
         )}
         label="Notifications"
         labelStyle={styles.drawerLabel}
         onPress={() => props.navigation.navigate('Notifications')}
-      />
+      /> */}
       <DrawerItem
         icon={({ color, size }) => (
         <Ionicons name="time-outline" size={size} color={styles.drawerIconColor.color} />
@@ -107,6 +162,7 @@ let {styles} = determineGlobalStyles(darkMode)
         labelStyle={styles.drawerLabel}
         onPress={handleLogout}
       />
+<Image source={determinedLogo} style={styles.logo} /> 
     </DrawerContentScrollView>
   );
 };
@@ -126,6 +182,7 @@ const localStyles = StyleSheet.create({
     marginTop: 10,
     fontSize: 18,
     fontWeight: 'bold',
+    paddingLeft: 20,
   },
   separator: {
     marginVertical: 10,

@@ -14,6 +14,9 @@ import { AuthContext } from '../context/AuthContext';
 import * as Animatable from 'react-native-animatable';
 import * as Location from 'expo-location';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 // import ProgressBarAnimation from '../components/ProgressBarAnimation'
 
 const DashboardScreen = () => {
@@ -60,6 +63,15 @@ const DashboardScreen = () => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+  
+
     // Handle the date change
     const handleDateChange = (event, selected) => {
       setShowDatePicker(Platform.OS === 'ios'); // Keep it open for iOS
@@ -83,7 +95,21 @@ const [totalSteps, setTotalSteps] = useState(3);
 //Loading state for retrieving current location
 const [loading, setLoading] = useState(false);
 const [loadingFriends, setLoadingFriends] = useState(true);
+//Effect to set the notifications token
+useEffect(() => {
+  registerForPushNotificationsAsync().then(token => {
+    // Save the token for later use if needed
+    console.log('Push token:', token);
+  });
 
+  const subscription = Notifications.addNotificationReceivedListener(notification => {
+    Alert.alert('Notification Received', notification.request.content.body);
+  });
+
+  return () => subscription.remove();
+}, []);
+
+//Effect to retrieve friends
 useEffect(() => {
   const fetchFriends = async () => {
     setLoadingFriends(true); // Start loading friends
@@ -118,6 +144,32 @@ useEffect(() => {
   };
   fetchFriends();
 }, []);
+
+//Helper function for notifications
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      Alert.alert('Failed to get push token for push notification!');
+      return;
+    }
+    try {
+      token = (await Notifications.getExpoPushTokenAsync({ projectId: Constants.expoConfig?.extra?.eas?.projectId })).data;
+    } catch (error) {
+      Alert.alert('Error getting push token', error.message);
+    }
+  } else {
+    Alert.alert('Must use physical device for Push Notifications');
+  }
+
+  return token;
+}
 
 //Helper function to have access to the side menu
   useFocusEffect(
@@ -160,27 +212,36 @@ useEffect(() => {
   };
 
   //Method to create the meeting object that will be sent out 
-  const handleCreateMeeting = async () => {
-    if (midpoint && selectedFriend) {
-      const currentUser = Parse.User.current();
-      const coordinates = midpoint;
-      const location = midpointAddress;
+ 
+const handleCreateMeeting = async () => {
+  if (midpoint && selectedFriend) {
+    const currentUser = Parse.User.current();
+    const coordinates = midpoint;
+    const location = midpointAddress;
+    const user1Id = currentUser.id;
+    const user2Id = selectedFriend.id;
 
-      // Reuse the createMeeting method
-      await createMeeting(
-        currentUser.id,
-        selectedFriend.id,
-        location,
-        coordinates,
-        time,
-        date
-      );
+    try {
+      // Call createMeeting with necessary parameters
+      await createMeeting(user1Id, user2Id, location, coordinates, time, date);
+      // Alert.alert('Meeting created successfully!');
 
-      Alert.alert('Meeting created successfully!');
-    } else {
-      Alert.alert('Error', 'Please find a meeting point and select a friend first.');
+      // Schedule a push notification after creating the meeting
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "New Meeting Created!",
+          body: `You have successfully created a meeting with ${selectedFriend.username} at ${location}.`,
+        },
+        trigger: { seconds: 1 }, // Trigger after 1 second
+      });
+    } catch (error) {
+      console.error('Error creating meeting:', error);
+      Alert.alert('Error', 'Failed to create meeting. Please try again.');
     }
-  };
+  } else {
+    Alert.alert('Error', 'Please select a friend and find the midpoint first.');
+  }
+};
 //Method to find the meeting or halfway point between the two points 
   const findMeetingPoint = async () => {
     if (userAddress && friendAddress) {
@@ -514,6 +575,58 @@ useEffect(() => {
                   : 'Select Date and Time'}
               </Text>
             </TouchableOpacity>
+            
+            {/* We have simplified the create meeting button */}
+            <TouchableOpacity
+            style={styles.bigButton}
+            onPress={handleCreateMeeting}
+            >
+             <Text style={styles.bigButtonText}>Create Meeting</Text>
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity
+            style={styles.bigButton}
+            onPress={() => {
+            // console.log(midpoint)
+            // console.log(selectedFriend)
+            if (midpoint && selectedFriend) {
+            const currentUser = Parse.User.current();
+            // console.log("CurrentUser " + currentUser)
+            const coordinates = midpoint;
+            // console.log("Coordinates " + coordinates)
+            const location = midpointAddress;
+            // console.log("Address " + midpointAddress)
+            const user1Id = currentUser.id;
+            // console.log("User1 " + user1Id)
+            const user2Id = selectedFriend.id;
+            // console.log(selectedFriend.name)
+            // console.log("User2 " + user2Id)
+
+          // Call createMeeting with necessary parameters
+          createMeeting(user1Id, user2Id, location, coordinates, time, date)
+          .then(() => {
+          Alert.alert('Meeting created successfully!');
+    //  // Schedule a push notification after creating the meeting
+    //  await Notifications.scheduleNotificationAsync({
+    //   content: {
+    //     title: "New Meeting Created!",
+    //     body: `You have successfully created a meeting with ${selectedFriend.username} at ${location}.`,
+    //   },
+    //   trigger: { seconds: 1 }, // Trigger after 1 second
+    // });
+          })
+          .catch((error) => {
+          console.error('Error creating meeting:', error);
+          Alert.alert('Error', 'Failed to create meeting. Please try again.');
+          });
+          } else {
+          Alert.alert('Error', 'Please select a friend and find the midpoint first.');
+          }
+          }}
+          >
+          <Text style={styles.bigButtonText}>Create Meeting</Text>
+          </TouchableOpacity> */}
+
         
             {showDatePicker && (
               <DateTimePicker
