@@ -114,37 +114,111 @@ const sendFriendRequest = async (receiverUserId) => {
   }
 };
 
-//Method to add two users to eachother's friends list 
+// const addToFriendsList = async (user1, user2) => {
+//   try {
+//     // Set ACLs for user1
+//     const acl1 = user1.getACL() || new Parse.ACL(user1);
+//     acl1.setReadAccess(user2, true);
+//     acl1.setWriteAccess(user2, true);
+//     user1.setACL(acl1);
+
+//     // Set ACLs for user2
+//     const acl2 = user2.getACL() || new Parse.ACL(user2);
+//     acl2.setReadAccess(user1, true);
+//     acl2.setWriteAccess(user1, true);
+//     user2.setACL(acl2);
+
+//     // Add each other to friends lists
+//     user1.addUnique("friends", user2);
+//     user2.addUnique("friends", user1);
+
+//     // Save both users with the master key to override ACL restrictions
+//     await Promise.all([
+//       user1.save(null, { useMasterKey: true }),
+//       user2.save(null, { useMasterKey: true }),
+//     ]);
+
+//     console.log(`Users ${user1.get('username')} and ${user2.get('username')} added to each other's friends list.`);
+//   } catch (error) {
+//     console.error('Error adding users to friends list:', error);
+//     throw error;
+//   }
+// };
 const addToFriendsList = async (user1, user2) => {
   try {
- 
-    const acl1 = user1.getACL() || new Parse.ACL(user1);
-    //Set the access controls for user1 to true to allow writing
-    acl1.setWriteAccess(user1, true); 
+    // Call the Cloud Function to add users as friends
+    const response = await Parse.Cloud.run("addFriends", {
+      user1Id: user1.id,
+      user2Id: user2.id,
+    });
 
-  
-    const acl2 = user2.getACL() || new Parse.ACL(user2);
-    //Set the access controls for user2 to true to allow writing 
-    acl2.setWriteAccess(user2, true);  
-
-    // Update both users' ACL
-    user1.setACL(acl1);
-    user2.setACL(acl2);
-    //Add to friends array for user1
-    user1.addUnique("friends", user2);
-
-    //Add to friends array for user 2
-    user2.addUnique("friends", user1);
-
-   //Save both changes concurrently
-    await Promise.all([user1.save(), user2.save()]);
-    //Log to console incase of error 
-    console.log(`Users ${user1.get('username')} and ${user2.get('username')} added to each other's friends list.`);
+    console.log(response); // Logs success message from the cloud function
   } catch (error) {
-    console.error('Error adding users to friends list:', error);
-    throw error;
+    console.error("Error calling cloud function to add friends:", error);
   }
 };
+
+// const addToFriendsList = async (user1, user2) => {
+//   try {
+//     // Get or create ACL for user1 and user2
+//     const acl1 = user1.getACL() || new Parse.ACL(user1);
+//     const acl2 = user2.getACL() || new Parse.ACL(user2);
+
+//     // Grant user1 read/write access to user2 and vice versa
+//     acl1.setReadAccess(user2, true);
+//     acl1.setWriteAccess(user2, true);
+//     acl2.setReadAccess(user1, true);
+//     acl2.setWriteAccess(user1, true);
+
+//     // Update ACLs on the entire user object for mutual access
+//     user1.setACL(acl1);
+//     user2.setACL(acl2);
+
+//     // Add each other as unique friends
+//     user1.addUnique("friends", user2);
+//     user2.addUnique("friends", user1);
+
+//     // Save both users with updated friend lists and ACLs
+//     await Promise.all([user1.save(), user2.save()]);
+
+//     console.log(`Users ${user1.get('username')} and ${user2.get('username')} added to each other's friends list.`);
+//   } catch (error) {
+//     console.error('Error adding users to friends list:', error);
+//     throw error;
+//   }
+// };
+
+// //Method to add two users to eachother's friends list 
+// const addToFriendsList = async (user1, user2) => {
+//   try {
+ 
+//     const acl1 = user1.getACL() || new Parse.ACL(user1);
+//     //Set the access controls for user1 to true to allow writing
+//     acl1.setWriteAccess(user1, true); 
+
+  
+//     const acl2 = user2.getACL() || new Parse.ACL(user2);
+//     //Set the access controls for user2 to true to allow writing 
+//     acl2.setWriteAccess(user2, true);  
+
+//     // Update both users' ACL
+//     user1.setACL(acl1);
+//     user2.setACL(acl2);
+//     //Add to friends array for user1
+//     user1.addUnique("friends", user2);
+
+//     //Add to friends array for user 2
+//     user2.addUnique("friends", user1);
+
+//    //Save both changes concurrently
+//     await Promise.all([user1.save(), user2.save()]);
+//     //Log to console incase of error 
+//     console.log(`Users ${user1.get('username')} and ${user2.get('username')} added to each other's friends list.`);
+//   } catch (error) {
+//     console.error('Error adding users to friends list:', error);
+//     throw error;
+//   }
+// };
 
 
 //Method to remove friends or connections 

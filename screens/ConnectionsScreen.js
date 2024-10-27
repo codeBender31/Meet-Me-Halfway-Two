@@ -1,6 +1,6 @@
 //This will have selector at the top to swithc between Find Connections and My Connections
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
 import { determineGlobalStyles } from '../components/Styles';
 import { getMyConnections, getAllUsers, getPendingRequests, handleFriendRequest, removeFriend, sendFriendRequest} from '../models/Connection';  // Import the getPendingRequests and handleFriendRequest functions
 import User from '../models/User'
@@ -17,6 +17,7 @@ const ConnectionsScreen = () => {
   const [myConnections, setMyConnections] = useState([]);
   const [allConnections, setAllConnections] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [disabledButtons, setDisabledButtons] = useState({});
 
   useEffect(() => {
   
@@ -64,9 +65,9 @@ const ConnectionsScreen = () => {
       <Text style={{ color: styles.loadingText.color }}>{item.name}</Text>
       {myConnections.length > 0 && (
         <View style={localStyles.buttonContainer}>
-          <TouchableOpacity style={localStyles.actionButton} onPress={() => {}}>
+          {/* <TouchableOpacity style={localStyles.actionButton} onPress={() => {}}>
             <Text style={localStyles.actionButtonText}>Request Meeting</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={localStyles.actionButton} onPress={() => handleRemoveFriend(item.id)}>
             <Text style={localStyles.actionButtonText}>Remove Connection</Text>
           </TouchableOpacity>
@@ -77,6 +78,7 @@ const ConnectionsScreen = () => {
 
   const renderAllConnection = ({ item }) => {
     const isAlreadyFriend = myConnections.some(connection => connection.id === item.id); 
+    const isButtonDisabled = disabledButtons[item.id] === true;
   
     return (
       <View style={localStyles.connectionItem}>
@@ -84,16 +86,19 @@ const ConnectionsScreen = () => {
         {!isAlreadyFriend && (
           <View style={localStyles.buttonContainer}>
             <TouchableOpacity 
-              style={localStyles.actionButton} 
+              style={[localStyles.actionButton, isButtonDisabled && localStyles.disabledButton]} 
               onPress={() => {
+                setDisabledButtons(prev => ({ ...prev, [item.id]: true }));
                 // Call sendFriendRequest function and pass the user ID
                 sendFriendRequest(item.id).then(() => {
                   console.log(`Friend request sent to ${item.name}`);
+                  Alert.alert("Request Sent", `Friend request sent to ${item.name} successfully!`);
                   fetchData(); // Refresh data after sending the request
                 }).catch(error => {
                   console.error('Error sending friend request:', error);
                 });
               }}
+              disabled={isButtonDisabled}
             >
               <Text style={localStyles.actionButtonText}>Add Connection</Text>
             </TouchableOpacity>
@@ -188,7 +193,10 @@ const localStyles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginTop: 20,
-  }
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
 });
 
 export default ConnectionsScreen;

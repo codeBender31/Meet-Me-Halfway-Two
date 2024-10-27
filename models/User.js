@@ -74,32 +74,48 @@ class User {
     return Parse.User.current();
   }
 
-  //This is only for debugging, to make sure friends are being added
-  static async getFriends() {
-    const currentUser = Parse.User.current();
-    if (!currentUser) {
-      console.log('No user is currently logged in.');
-      return;
-    }
 
-    const friends = currentUser.get('friends'); // Retrieve the friends array
+  // This is only for debugging, to make sure friends are being added
+// This is only for debugging, to make sure friends are being added
+// This is only for debugging, to make sure friends are being added
+static async getFriends() {
+  let currentUser = Parse.User.current();
 
+  // Double-check that a user is logged in
+  if (!currentUser) {
+    console.log('No user is currently logged in.');
+    return;
+  }
+
+  try {
+    // Refetch currentUser to get the latest data, including the friends list
+    currentUser = await currentUser.fetch();
+
+    // Retrieve the friends array (which consists of full user objects)
+    const friends = currentUser.get('friends');
+
+    // Check if friends array is valid and has data
     if (!friends || friends.length === 0) {
       console.log('No friends found for this user. You can find this log in the User model');
       return;
     }
-      //Print the length of the friends array
-      // console.log("Current friends array " + friends.length)
-    // Fetch details for each friend (friends may be stored as pointers or objects)
-    for (let friendPointer of friends) {
+
+    // Log the length of the friends array
+    console.log('Number of friends:', friends.length);
+
+    // Iterate through each friend (already a full user object)
+    for (let friend of friends) {
       try {
-        const friend = await friendPointer.fetch(); // Fetch the actual user object
-        // console.log(`Friend: ${friend.get('username')}, Email: ${friend.get('email')}`);
+        // Directly access friend details since it is already a full object
+        console.log(`Friend: ${friend.username}, Email: ${friend.email}`);
       } catch (error) {
-        console.error('Error fetching friend details:', error);
+        console.error('Error accessing friend details:', error);
       }
     }
+  } catch (error) {
+    console.error('Error refetching the current user:', error);
   }
+}
 }
 
 export default User;

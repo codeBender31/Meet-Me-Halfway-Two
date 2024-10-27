@@ -108,8 +108,7 @@ useEffect(() => {
 
   return () => subscription.remove();
 }, []);
-
-//Effect to retrieve friends
+// Effect to retrieve friends with retry mechanism
 useEffect(() => {
   const fetchFriends = async () => {
     setLoadingFriends(true); // Start loading friends
@@ -118,20 +117,36 @@ useEffect(() => {
       if (currentUser) {
         setUsername(currentUser.getUsername());
         const friendsArray = currentUser.get('friends') || [];
-        const fetchedFriends = [];
+        // const friendsArray = currentUser.get('friends') || currentUser.get('friendsList') || [];
 
-        // Fetch details for each friend (if they are stored as pointers)
-        for (const friendPointer of friendsArray) {
+        console.log(friendsArray)
+
+        // Fetch details for each friend in parallel with retry logic
+        const friendPromises = friendsArray.map(async (friendPointer, index) => {
           try {
-            const friend = await friendPointer.fetch();
-            fetchedFriends.push({
+            let friend = await friendPointer.fetch();
+            
+            // Check if data is complete; retry if necessary
+            if (!friend.get('username') || !friend.get('email')) {
+              console.log(`Retrying fetch for friend ${index + 1} due to missing data...`);
+              const userQuery = new Parse.Query(Parse.User);
+              friend = await userQuery.get(friend.id);
+            }
+            
+            // Return fetched friend details
+            return {
               id: friend.id,
               username: friend.get('username'),
-            });
+              // email: friend.get('email'), // Include email if needed
+            };
           } catch (error) {
-            console.error('Error fetching friend details:', error);
+            console.error(`Error fetching or re-fetching friend ${index + 1}:`, error);
+            return null; // Return null for failed fetches to avoid breaking Promise.all
           }
-        }
+        });
+
+        // Resolve all promises and filter out any null values
+        const fetchedFriends = (await Promise.all(friendPromises)).filter(Boolean);
 
         setFriends(fetchedFriends); // Set the fully fetched friend details
       }
@@ -142,8 +157,45 @@ useEffect(() => {
       setLoadingFriends(false); // End loading friends
     }
   };
+
   fetchFriends();
 }, []);
+
+// //Effect to retrieve friends
+// useEffect(() => {
+//   const fetchFriends = async () => {
+//     setLoadingFriends(true); // Start loading friends
+//     try {
+//       const currentUser = Parse.User.current();
+//       if (currentUser) {
+//         setUsername(currentUser.getUsername());
+//         const friendsArray = currentUser.get('friends') || [];
+//         const fetchedFriends = [];
+
+//         // Fetch details for each friend (if they are stored as pointers)
+//         for (const friendPointer of friendsArray) {
+//           try {
+//             const friend = await friendPointer.fetch();
+//             fetchedFriends.push({
+//               id: friend.id,
+//               username: friend.get('username'),
+//             });
+//           } catch (error) {
+//             console.error('Error fetching friend details:', error);
+//           }
+//         }
+
+//         setFriends(fetchedFriends); // Set the fully fetched friend details
+//       }
+//     } catch (error) {
+//       console.error('Error fetching friends:', error);
+//       Alert.alert('Error', 'Failed to fetch friends. Please try again later.');
+//     } finally {
+//       setLoadingFriends(false); // End loading friends
+//     }
+//   };
+//   fetchFriends();
+// }, []);
 
 //Helper function for notifications
 async function registerForPushNotificationsAsync() {
