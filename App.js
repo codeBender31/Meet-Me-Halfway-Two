@@ -77,7 +77,7 @@ function DrawerNavigator() {
 
 function AppNavigation(){
     const {darkMode} = useContext(AuthContext);
-    console.log(`App.js this is the current darkMode ${darkMode}` )
+    // console.log(`App.js this is the current darkMode ${darkMode}` )
   const { styles } = determineGlobalStyles(darkMode); 
   // const {styles} = determineGlobalStyles();
   return (
@@ -113,35 +113,6 @@ function App(){
     </AuthProvider>
   );
 }
-// function App() {
-//   let {darkMode} = useContext(AuthContext);
-//   const { styles } = determineGlobalStyles(darkMode); 
-//   // const {styles} = determineGlobalStyles();
-//   return (
-//     <AuthProvider>
-//       <NavigationContainer>
-//         <Stack.Navigator 
-//           initialRouteName="LoadingScreen"
-//           screenOptions={{
-//             headerStyle: {
-//               backgroundColor: styles.container.backgroundColor,  
-//             },
-//             headerTintColor: styles.loadingText.color,  
-//             headerTitleStyle: {
-//               fontWeight: 'bold',
-//             },
-//           }}
-//         >
-//           <Stack.Screen name="Loading" component={LoadingScreen} />
-//           <Stack.Screen name="Welcome" component={WelcomeScreen} />
-//           <Stack.Screen name="Sign Up" component={RegisterModal} />
-//           <Stack.Screen name="Login" component={LoginModal} />
-//           <Stack.Screen name="MidwayGuest" component={MidwayGuest} />
-//           <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
-//         </Stack.Navigator>
-//       </NavigationContainer>
-//     </AuthProvider>
-//   );
-// }
+
 
 export default App;

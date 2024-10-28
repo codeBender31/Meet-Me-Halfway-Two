@@ -99,7 +99,7 @@ const [loadingFriends, setLoadingFriends] = useState(true);
 useEffect(() => {
   registerForPushNotificationsAsync().then(token => {
     // Save the token for later use if needed
-    console.log('Push token:', token);
+    // console.log('Push token:', token);
   });
 
   const subscription = Notifications.addNotificationReceivedListener(notification => {
@@ -108,6 +108,8 @@ useEffect(() => {
 
   return () => subscription.remove();
 }, []);
+
+
 // Effect to retrieve friends with retry mechanism
 useEffect(() => {
   const fetchFriends = async () => {
@@ -119,7 +121,7 @@ useEffect(() => {
         const friendsArray = currentUser.get('friends') || [];
         // const friendsArray = currentUser.get('friends') || currentUser.get('friendsList') || [];
 
-        console.log(friendsArray)
+        // console.log(friendsArray)
 
         // Fetch details for each friend in parallel with retry logic
         const friendPromises = friendsArray.map(async (friendPointer, index) => {
@@ -128,7 +130,7 @@ useEffect(() => {
             
             // Check if data is complete; retry if necessary
             if (!friend.get('username') || !friend.get('email')) {
-              console.log(`Retrying fetch for friend ${index + 1} due to missing data...`);
+              // console.log(`Retrying fetch for friend ${index + 1} due to missing data...`);
               const userQuery = new Parse.Query(Parse.User);
               friend = await userQuery.get(friend.id);
             }

@@ -42,6 +42,22 @@ class User {
   setPassword(password) {
     this.user.set('password', password);
   }
+    // Method to set the profile picture
+    async setProfilePicture(file) {
+      try {
+        // Create a Parse File with the uploaded image
+        const parseFile = new Parse.File("profile_picture.jpg", file);
+  
+        // Set the profile picture in the User object
+        this.user.set("profilePicture", parseFile);
+  
+        // Save the user object
+        await this.user.save();
+        console.log('Profile picture uploaded successfully');
+      } catch (error) {
+        console.error('Error uploading profile picture:', error);
+      }
+    }
 //Call the async signup method 
   async signUp() {
     //Await for the response 
@@ -101,13 +117,13 @@ static async getFriends() {
     }
 
     // Log the length of the friends array
-    console.log('Number of friends:', friends.length);
+    // console.log('Number of friends:', friends.length);
 
     // Iterate through each friend (already a full user object)
     for (let friend of friends) {
       try {
         // Directly access friend details since it is already a full object
-        console.log(`Friend: ${friend.username}, Email: ${friend.email}`);
+        // console.log(`Friend: ${friend.username}, Email: ${friend.email}`);
       } catch (error) {
         console.error('Error accessing friend details:', error);
       }

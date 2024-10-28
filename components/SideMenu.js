@@ -24,6 +24,33 @@ let {styles, determinedLogo} = determineGlobalStyles(darkMode)
   const username = currentUser ? currentUser.getUsername() : 'Guest';
   const navigation = useNavigation();
   const [hasNewNotifications, setHasNewNotifications] = useState(false);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+
+  useEffect(() => {
+    const fetchUserProfilePicture = async () => {
+      try {
+        if (currentUser) {
+          // Fetch the current user to get the latest data, including profile picture
+          await currentUser.fetch();
+  
+          const profilePicture = currentUser.get('profilePicture');
+          if (profilePicture && profilePicture instanceof Parse.File) {
+            setProfilePictureUrl(profilePicture.url());
+          } else if (typeof profilePicture === 'string') {
+            setProfilePictureUrl(profilePicture);
+          } else {
+            console.log("Profile picture is not set or is in an unexpected format.");
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile picture:', error);
+      }
+    };
+  
+    fetchUserProfilePicture();
+  }, [currentUser]);
+  
+  
 
   // Check for new notifications periodically
   useEffect(() => {
@@ -78,11 +105,12 @@ let {styles, determinedLogo} = determineGlobalStyles(darkMode)
     //Set up the props
     <DrawerContentScrollView {...props}>
       <View style={styles.profileSection}>
-        <Image
-          source={{ uri: './assets/icon.png' }} 
-          style={localStyles.profileImage}
-        />
-        <Text style={styles.profileName}>{username}</Text>
+        {profilePictureUrl ? (
+          <Image source={{ uri: profilePictureUrl }} style={localStyles.profileImage} />
+        ) : (
+          <Image source={require('../assets/favicon.png')} style={localStyles.profileImage} />
+        )}
+        <Text style={localStyles.profileName}>{username}</Text>
       </View>
       {/*Here we declare all components from the side menu */}
       <DrawerItem
@@ -162,33 +190,41 @@ let {styles, determinedLogo} = determineGlobalStyles(darkMode)
         labelStyle={styles.drawerLabel}
         onPress={handleLogout}
       />
-<Image source={determinedLogo} style={styles.logo} /> 
+<Image source={determinedLogo} style={localStyles.logo} /> 
     </DrawerContentScrollView>
   );
 };
 //This styling applies only to the side menu and applies to anything not using global styles 
 const localStyles = StyleSheet.create({
   profileSection: {
+    paddingLeft: 40,
     padding: 20,
-    alignItems: 'center',
+    alignItems: 'flex-start', 
     justifyContent: 'center',
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
+    marginLeft: 50,
+    paddingLeft: 20,
   },
   profileName: {
     marginTop: 10,
     fontSize: 18,
     fontWeight: 'bold',
-    paddingLeft: 20,
+    paddingLeft: 60, 
   },
   separator: {
     marginVertical: 10,
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
   },
+  logo: {
+    width: 200,
+    height: 200,
+    borderRadius: 50,
+  }
 });
 
 export default SideMenu;

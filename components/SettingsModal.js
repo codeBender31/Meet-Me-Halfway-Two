@@ -1,8 +1,13 @@
 //This will be the settings modal for dark mode, notifications, profile pic, etc.
 import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, Switch, TextInput, StyleSheet, ScrollView, Alert} from 'react-native';
+import { View, Text, TouchableOpacity, Switch, TextInput, StyleSheet, ScrollView, Alert, Image, Button, ActivityIndicator} from 'react-native';
 import {AuthContext} from '../context/AuthContext'
 import { determineGlobalStyles } from './Styles';
+import User from '../models/User'
+// import { launchImageLibrary } from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+import Parse from 'parse/react-native.js';
+
 
 const SettingsScreen = () => {
   //Set the states that will be controlled in the page 
@@ -29,6 +34,10 @@ const SettingsScreen = () => {
   const toggleNotifications = () => setIsNotificationsEnabled(!isNotificationsEnabled);
 //Create the toggle for the location 
   const toggleLocation = () => setIsLocationEnabled(!isLocationEnabled);
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [loadingImage, setLoadingImage] = useState(false);
+
 
   //Helper function to change username
     const handleChangeUsername = () => {
@@ -119,6 +128,77 @@ const SettingsScreen = () => {
       );
     };
 
+    const handleChoosePhoto = async () => {
+      try {
+        // Request permission to access the media library
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+        if (!permissionResult.granted) {
+          Alert.alert("Permission Denied", "You need to allow permissions to access the gallery!");
+          return;
+        }
+    
+        // Launch the image picker
+        const response = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          quality: 1,
+        });
+    
+        // Log the full response to understand its structure
+        console.log('ImagePicker response:', response);
+    
+        // If the user didn't cancel the selection, proceed
+        if (!response.canceled && response.assets && response.assets.length > 0) {
+          const asset = response.assets[0]; // Get the first selected asset
+          if (asset.uri) {
+            const file = {
+              uri: asset.uri,
+              type: asset.mimeType ? asset.mimeType : 'image/jpeg', // Use mimeType from the asset if available
+              name: asset.fileName ? asset.fileName : asset.uri.split('/').pop(), // Use fileName if available
+            };
+            uploadProfilePicture(file);
+          } else {
+            console.error('Image URI is undefined.');
+          }
+        } else {
+          console.log('User cancelled image selection or no assets found.');
+        }
+      } catch (error) {
+        console.error('Error in handleChoosePhoto:', error);
+        Alert.alert('Error', 'Something went wrong while selecting the image.');
+      }
+    };
+    
+  
+    const uploadProfilePicture = async (file) => {
+      try {
+        setLoadingImage(true); // Start loading
+  
+        // Get the currently logged-in user
+        const currentUser = Parse.User.current();
+        if (!currentUser) {
+          throw new Error('No user is currently logged in.');
+        }
+  
+        // Create a Parse File with the uploaded image
+        const parseFile = new Parse.File(file.name, file);
+  
+        // Set the profile picture in the currentUser object
+        currentUser.set("profilePicture", parseFile);
+  
+        // Save the updated user object
+        await currentUser.save();
+        setProfileImage(file.uri);
+        Alert.alert('Success', 'Profile picture uploaded successfully.');
+      } catch (error) {
+        Alert.alert('Error', 'Failed to upload profile picture.');
+        console.error('Error uploading profile picture:', error);
+      } finally {
+        setLoadingImage(false); // End loading
+      }
+    };
+
   return (
     // <ScrollView contentContainerStyle={styles.scrollContainer}>
     <View style = {styles.scrollContainer}>
@@ -200,7 +280,15 @@ const SettingsScreen = () => {
           onChangeText={setEmail}
         />
       </View> */}
-
+   
+   <View style={styles.settingItem}>
+        <Button title="Choose Profile Picture" onPress={handleChoosePhoto} />
+        {loadingImage ? (
+          <ActivityIndicator size="small" color="#0000ff" />
+        ) : (
+          profileImage && <Image source={{ uri: profileImage }} style={{ width: 100, height: 100 }} />
+        )}
+      </View>
       {/* <View style={styles.settingItem}>
         <Text style={styles.settingText}>Font Type</Text>
         <View style={styles.languageSelector}>
@@ -246,55 +334,6 @@ const SettingsScreen = () => {
 
   );
 };
-// //Temporary styling 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 20,
-//     backgroundColor: '#f9f9f9',
-//   },
-//   settingItem: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     paddingVertical: 15,
-//     borderBottomWidth: 1,
-//     borderBottomColor: '#ccc',
-//   },
-//   settingText: {
-//     fontSize: 18,
-//   },
-//   languageSelector: {
-//     flexDirection: 'row',
-//     justifyContent: 'flex-end',
-//   },
-//   languageButton: {
-//     paddingHorizontal: 10,
-//     paddingVertical: 5,
-//     marginHorizontal: 5,
-//     backgroundColor: '#ddd',
-//     borderRadius: 20,
-//   },
-//   activeButton: {
-//     backgroundColor: '#007BFF',
-//   },
-//   languageText: {
-//     color: '#fff',
-//     fontWeight: 'bold',
-//   },
-//   versionText: {
-//     fontSize: 16,
-//     color: '#777',
-//   },
-//   input: {
-//     flex: 1,
-//     borderWidth: 1,
-//     borderColor: '#ccc',
-//     borderRadius: 5,
-//     paddingHorizontal: 10,
-//     paddingVertical: 5,
-//     backgroundColor: '#fff',
-//   },
-// });
+
 
 export default SettingsScreen;
