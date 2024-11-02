@@ -1,6 +1,6 @@
 //This modal will display any meeting objects that have been stored in the database and already sent out through sms
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, FlatList, ActivityIndicator, RefreshControl, Modal, TouchableOpacity, Button, Linking, Image, StyleSheet, ScrollView} from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, RefreshControl, Modal, TouchableOpacity, Button, Linking, Image, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
 import Parse from 'parse/react-native.js';
 import { AuthContext } from '../context/AuthContext';
 import { determineGlobalStyles } from './Styles';
@@ -188,14 +188,26 @@ const APIkey= 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc'
                 <Text style={styles.meetingText}>Time: {time}</Text>
                 {coordinates && (
                 <>
-                <Button
+                {/* <Button
                       title="Open in Google Maps"
                       onPress={() => openGoogleMaps(coordinates.latitude, coordinates.longitude)}
-                    />
-                    <Button
+                    /> */}
+                     <TouchableOpacity
+                      style={styles.bigButton}
+                      onPress={() => openGoogleMaps(coordinates.latitude, coordinates.longitude)}
+                      >
+                    <Text style={styles.bigButtonText}>Open in Google Maps</Text>
+                    </TouchableOpacity>
+                    {/* <Button
                       title="Nearby Safe Places"
                       onPress={() => openNearbySafePlacesModal(coordinates.latitude, coordinates.longitude)}
-                    />
+                    /> */}
+                      <TouchableOpacity
+                      style={styles.bigButton}
+                      onPress={() => openNearbySafePlacesModal(coordinates.latitude, coordinates.longitude)}
+                      >
+                    <Text style={styles.bigButtonText}>Nearby Safe Places</Text>
+    </TouchableOpacity>
                 </>
                 )}
               </View>
@@ -208,7 +220,8 @@ const APIkey= 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc'
         <Text>No scheduled meetings found.</Text>
       )}
 <Modal visible={modalVisible} animationType="slide">
-  <View style={localStyles.modalContainer}>
+  {/* <View style={localStyles.modalContainer}> */}
+  <SafeAreaView style={localStyles.modalContainer}>
   {/* <ScrollView contentContainerStyle={localStyles.modalContent}> */}
     {/* <TouchableOpacity onPress={() => setModalVisible(false)}>
       <Text style={localStyles.closeButton}>Close</Text>
@@ -225,11 +238,11 @@ const APIkey= 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc'
           // console.log('Photo URL:', photoUrl);
         
           return (
-            <View style={styles.placeItem}>
-              <Text style={styles.placeName}>{item.name}</Text>
-              <Text style={styles.placeAddress}>{item.vicinity}</Text>
-              <Text style={styles.placeRating}>Rating: {item.rating} ({item.totalRatings} reviews)</Text>
-              <Text style={styles.placeOpenNow}>
+            <View style={localStyles.placeItem}>
+              <Text style={localStyles.placeName}>{item.name}</Text>
+              <Text style={localStyles.placeAddress}>{item.vicinity}</Text>
+              <Text style={localStyles.placeRating}>Rating: {item.rating} ({item.totalRatings} reviews)</Text>
+              <Text style={localStyles.placeOpenNow}>
                 {item.openNow !== 'N/A' ? (item.openNow ? 'Open Now' : 'Closed Now') : 'Opening hours not available'}
               </Text>
               {photoUrl && (
@@ -238,10 +251,16 @@ const APIkey= 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc'
                   style={localStyles.placePhoto}
                 />
               )}
-              <Button
+                <TouchableOpacity
+                style={styles.bigButton}
+                onPress={() => openGoogleMaps(item.coordinates.lat, item.coordinates.lng)}
+                >
+      <Text style={styles.bigButtonText}>Open in Google Maps</Text>
+    </TouchableOpacity>
+              {/* <Button
                 title="Open in Google Maps"
                 onPress={() => openGoogleMaps(item.coordinates.lat, item.coordinates.lng)}
-              />
+              /> */}
             </View>
           );
         }}
@@ -250,8 +269,12 @@ const APIkey= 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc'
       <Text>No nearby safe places found.</Text>
     )}
      {/* </ScrollView> */}
-     <Button title="Close" onPress={() => setModalVisible(false)} />
-  </View>
+     {/* <Button title="Close" onPress={() => setModalVisible(false)} /> */}
+     <TouchableOpacity style={styles.bigButton} onPress={() => setModalVisible(false)}>
+  <Text style={styles.bigButtonText}>Close</Text>
+</TouchableOpacity>
+  {/* </View> */}
+  </SafeAreaView>
 </Modal>
 
     </View>
@@ -278,5 +301,44 @@ const localStyles = StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: 'cover',
-  }
+  },
+  placeItem: {
+    backgroundColor: '#f9f9f9', 
+    borderRadius: 8,
+    padding: 15,
+    marginVertical: 10,
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  placeName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  placeAddress: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 5,
+  },
+  placeRating: {
+    fontSize: 14,
+    color: '#888',
+  },
+  placeOpenNow: {
+    fontSize: 14,
+    color: '#007700',
+    fontWeight: '600',
+    marginBottom: 5,
+  },
+  placePhoto: {
+    width: '100%', 
+    height: 150,
+    resizeMode: 'cover',
+    borderRadius: 8,
+    marginVertical: 10,
+  },
 })

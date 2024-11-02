@@ -163,42 +163,6 @@ useEffect(() => {
   fetchFriends();
 }, []);
 
-// //Effect to retrieve friends
-// useEffect(() => {
-//   const fetchFriends = async () => {
-//     setLoadingFriends(true); // Start loading friends
-//     try {
-//       const currentUser = Parse.User.current();
-//       if (currentUser) {
-//         setUsername(currentUser.getUsername());
-//         const friendsArray = currentUser.get('friends') || [];
-//         const fetchedFriends = [];
-
-//         // Fetch details for each friend (if they are stored as pointers)
-//         for (const friendPointer of friendsArray) {
-//           try {
-//             const friend = await friendPointer.fetch();
-//             fetchedFriends.push({
-//               id: friend.id,
-//               username: friend.get('username'),
-//             });
-//           } catch (error) {
-//             console.error('Error fetching friend details:', error);
-//           }
-//         }
-
-//         setFriends(fetchedFriends); // Set the fully fetched friend details
-//       }
-//     } catch (error) {
-//       console.error('Error fetching friends:', error);
-//       Alert.alert('Error', 'Failed to fetch friends. Please try again later.');
-//     } finally {
-//       setLoadingFriends(false); // End loading friends
-//     }
-//   };
-//   fetchFriends();
-// }, []);
-
 //Helper function for notifications
 async function registerForPushNotificationsAsync() {
   let token;

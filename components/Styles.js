@@ -136,6 +136,7 @@ export const determineGlobalStyles = (darkMode) => {
       marginTop: 10,
       fontSize: 20,
       textAlign: 'center',
+      fontWeight: 'bold',
       // padding: 25,
     },
     error: {

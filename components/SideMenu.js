@@ -110,7 +110,7 @@ let {styles, determinedLogo} = determineGlobalStyles(darkMode)
         ) : (
           <Image source={require('../assets/favicon.png')} style={localStyles.profileImage} />
         )}
-        <Text style={localStyles.profileName}>{username}</Text>
+        <Text style={styles.screenText}>{username}</Text>
       </View>
       {/*Here we declare all components from the side menu */}
       <DrawerItem
@@ -206,7 +206,7 @@ const localStyles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginLeft: 50,
+    marginLeft: 70,
     paddingLeft: 20,
   },
   profileName: {
@@ -224,6 +224,7 @@ const localStyles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 50,
+    marginLeft: 20,
   }
 });
 

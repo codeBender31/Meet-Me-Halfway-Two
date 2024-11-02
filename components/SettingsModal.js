@@ -154,8 +154,8 @@ const SettingsScreen = () => {
           if (asset.uri) {
             const file = {
               uri: asset.uri,
-              type: asset.mimeType ? asset.mimeType : 'image/jpeg', // Use mimeType from the asset if available
-              name: asset.fileName ? asset.fileName : asset.uri.split('/').pop(), // Use fileName if available
+              type: asset.mimeType ? asset.mimeType : 'image/jpeg', 
+              name: asset.fileName ? asset.fileName : asset.uri.split('/').pop(),
             };
             uploadProfilePicture(file);
           } else {
@@ -207,8 +207,8 @@ const SettingsScreen = () => {
       <Switch
   value={darkMode}
   onValueChange={(value) => {
-    toggleDarkMode(value); // Ensure toggleDarkMode gets the new value
-    console.log('Switch toggled: ', value); // Debugging output to ensure it's toggling
+    toggleDarkMode(value); 
+    console.log('Switch toggled: ', value); 
     }}/>
       </View>
 
@@ -282,7 +282,10 @@ const SettingsScreen = () => {
       </View> */}
    
    <View style={styles.settingItem}>
-        <Button title="Choose Profile Picture" onPress={handleChoosePhoto} />
+        {/* <Button title="Choose Profile Picture" onPress={handleChoosePhoto} /> */}
+        <TouchableOpacity style={styles.bigButton} onPress={handleChoosePhoto}>
+        <Text style={styles.bigButtonText}>Change Profile Picture</Text>
+        </TouchableOpacity>
         {loadingImage ? (
           <ActivityIndicator size="small" color="#0000ff" />
         ) : (
