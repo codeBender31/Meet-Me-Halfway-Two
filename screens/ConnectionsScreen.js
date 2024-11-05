@@ -1,6 +1,6 @@
 //This will have selector at the top to swithc between Find Connections and My Connections
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, Image, TextInput, Modal } from 'react-native';
 import { determineGlobalStyles } from '../components/Styles';
 import { getMyConnections, getAllUsers, getPendingRequests, handleFriendRequest, removeFriend, sendFriendRequest} from '../models/Connection';  // Import the getPendingRequests and handleFriendRequest functions
 import User from '../models/User'
@@ -18,12 +18,24 @@ const ConnectionsScreen = () => {
   const [allConnections, setAllConnections] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [disabledButtons, setDisabledButtons] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredConnections, setFilteredConnections] = useState([]);
+
+  
 
   useEffect(() => {
   
     fetchData();
   }, []);
-
+//Helper function to open selected profile picture
+  const openImageModal = (imageUri) => {
+    setSelectedImage(imageUri);
+  };
+  //Helper function to close selected profile picture 
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
     const handleRemoveFriend = async (friendUserId) => {
       try {
         await removeFriend(friendUserId); 
@@ -40,12 +52,30 @@ const ConnectionsScreen = () => {
       const pendingRequestsList = await getPendingRequests();  
       setMyConnections(userConnections); 
       setAllConnections(allUsers);  
-      setPendingRequests(pendingRequestsList); 
+      // setPendingRequests(pendingRequestsList); 
+      setFilteredConnections(view === 'myConnections' ? userConnections : allUsers); 
+
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
+  useEffect(() => {
+    if (view === 'myConnections') {
+      setFilteredConnections(
+        myConnections.filter(connection =>
+          connection.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    } else if (view === 'allConnections') {
+      setFilteredConnections(
+        allConnections.filter(connection =>
+          connection.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [searchTerm, view, myConnections, allConnections]);
+  
   const renderPendingRequest = ({ item }) => (
     <View style={localStyles.connectionItem}>
       <Text style={{ color: styles.loadingText.color }}>{item.name}</Text>
@@ -62,7 +92,10 @@ const ConnectionsScreen = () => {
 
   const renderMyConnection = ({ item }) => (
     <View style={localStyles.connectionItem}>
-      <Text style={{ color: styles.loadingText.color }}>{item.name}</Text>
+       <TouchableOpacity onPress={() => openImageModal(item.profilePicture)}>
+      <Image source={{ uri: item.profilePicture }} style={localStyles.profileImage} />
+      </TouchableOpacity>
+      <Text style={{ color: styles.loadingText.color, fontWeight: 'bold'}}>{item.name}</Text>
       {myConnections.length > 0 && (
         <View style={localStyles.buttonContainer}>
           {/* <TouchableOpacity style={localStyles.actionButton} onPress={() => {}}>
@@ -82,7 +115,10 @@ const ConnectionsScreen = () => {
   
     return (
       <View style={localStyles.connectionItem}>
-        <Text style={{ color: styles.loadingText.color }}>{item.name}</Text>
+         <TouchableOpacity onPress={() => openImageModal(item.profilePicture)}>
+        <Image source={{ uri: item.profilePicture }} style={localStyles.profileImage} />
+        </TouchableOpacity>
+        <Text style={{ color: styles.loadingText.color, fontWeight: 'bold',}}>{item.name}</Text>
         {!isAlreadyFriend && (
           <View style={localStyles.buttonContainer}>
             <TouchableOpacity 
@@ -111,6 +147,7 @@ const ConnectionsScreen = () => {
 
   return (
     <View style={styles.container}>
+
       <View style={styles.switchContainer}>
         <TouchableOpacity
           style={[styles.switchButton, view === 'myConnections' && styles.activeButton]}
@@ -128,10 +165,19 @@ const ConnectionsScreen = () => {
 
       </View>
 
+      <TextInput
+      style={localStyles.searchBar}
+      placeholder="Search connections..."
+     placeholderTextColor="#888"
+    value={searchTerm}
+    onChangeText={setSearchTerm}
+    />
+
      
       {view === 'myConnections' && myConnections.length > 0 && (
         <FlatList
-          data={myConnections}
+          // data={myConnections}
+          data={filteredConnections}
           keyExtractor={(item) => item.id}
           renderItem={renderMyConnection}
           style={styles.list}
@@ -143,7 +189,8 @@ const ConnectionsScreen = () => {
 
       {view === 'allConnections' && (
         <FlatList
-          data={allConnections}
+          // data={allConnections}
+          data={filteredConnections}
           keyExtractor={(item) => item.id}
           renderItem={renderAllConnection}
           style={styles.list}
@@ -161,6 +208,17 @@ const ConnectionsScreen = () => {
       {view === 'pendingRequests' && pendingRequests.length === 0 && (
         <Text style={styles.noDataText}>No pending requests</Text>  
       )}
+
+{selectedImage && (
+  <Modal visible={true} transparent={true} animationType="fade" onRequestClose={closeImageModal}>
+    <View style={localStyles.modalContainer}>
+      <TouchableOpacity style={localStyles.modalCloseButton} onPress={closeImageModal}>
+        <Text style={localStyles.modalCloseText}>Close</Text>
+      </TouchableOpacity>
+      <Image source={{ uri: selectedImage }} style={localStyles.modalImage} />
+    </View>
+  </Modal>
+)}
     </View>
   );
 };
@@ -171,18 +229,20 @@ const localStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
+    
   },
   actionButton: {
     backgroundColor: '#007BFF',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 5,
-    marginLeft: 5,
+    marginLeft: 30,
   },
   actionButtonText: {
     color: '#fff',
@@ -196,6 +256,42 @@ const localStyles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: '#ccc',
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 30,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  modalImage: {
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+  },
+  modalCloseText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  searchBar: {
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    margin: 10,
+    color: 'black',
+    backgroundColor: 'white',
+    width: '100%'
   },
 });
 

@@ -51,7 +51,11 @@ const getMyConnections = async () => {
         }
 
         // Return the completed connection details
-        return { id: otherUser.id, name: otherUser.get('username') };
+        return { 
+          id: otherUser.id, 
+          name: otherUser.get('username'),
+          profilePicture: otherUser.get('profilePicture')?.url() || null 
+        };
       })
     );
 
@@ -81,6 +85,7 @@ const getAllUsers = async () => {
     return users.map(user => ({
       id: user.id,
       name: user.get("username"),
+      profilePicture: user.get("profilePicture")?.url() || null 
     }));
   } catch (error) {
     console.error('Error fetching users:', error);

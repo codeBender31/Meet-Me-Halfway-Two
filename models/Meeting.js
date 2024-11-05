@@ -84,6 +84,7 @@ const sendMeetingNotificationViaTwilio = async (user1, user2, meeting) => {
         }
       );
       console.log(`SMS sent successfully to ${to}`);
+      console.log(`Twilio response:`, response.data);
     } catch (error) {
       console.error('Error sending SMS:', error);
     }
@@ -93,5 +94,31 @@ const sendMeetingNotificationViaTwilio = async (user1, user2, meeting) => {
   sendSms(user2.get('phoneNumber'), messageBody);
 };
 
-export { createMeeting, openGoogleMaps };
+// Method to get all upcoming meetings
+const getUpcomingMeetings = async () => {
+  const Meeting = Parse.Object.extend('Meeting');
+  const query = new Parse.Query(Meeting);
+  const currentDate = new Date();
+
+  query.greaterThanOrEqualTo('date', currentDate); // Only fetch meetings with a future date
+  query.ascending('date'); // Sort by date in ascending order
+
+  try {
+    const upcomingMeetings = await query.find();
+    // console.log('Upcoming meetings:', upcomingMeetings);
+    return upcomingMeetings.map(meeting => ({
+      id: meeting.id,
+      location: meeting.get('location'),
+      coordinates: meeting.get('coordinates'),
+      date: meeting.get('date'),
+      time: meeting.get('time'),
+      user1: meeting.get('user1').get('username'),
+      user2: meeting.get('user2').get('username'),
+    }));
+  } catch (error) {
+    console.error('Error fetching upcoming meetings:', error);
+    return [];
+  }
+};
+export { createMeeting, openGoogleMaps, getUpcomingMeetings };
 
