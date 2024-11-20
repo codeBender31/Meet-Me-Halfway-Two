@@ -10,10 +10,11 @@ export default WelcomeScreen = ({ navigation }) => {
     let {styles, determinedLogo} = determineGlobalStyles()
  
   return (
+    
     <View style = {styles.container}>
     <Image source={determinedLogo} style={styles.logo} />
     {/* <Text style={styles.screenText}>Find the perfect meeting spot.</Text> */}
-    <TextAnimation/>
+    {/* <TextAnimation/> */}
       <TouchableOpacity
      style={styles.bigButton}
      onPress={() => navigation.navigate('Login')}>

@@ -121,7 +121,7 @@ useEffect(() => {
         const friendsArray = currentUser.get('friends') || [];
         // const friendsArray = currentUser.get('friends') || currentUser.get('friendsList') || [];
 
-        // console.log(friendsArray)
+        console.log(friendsArray)
 
         // Fetch details for each friend in parallel with retry logic
         const friendPromises = friendsArray.map(async (friendPointer, index) => {
@@ -722,7 +722,7 @@ const progressStyling = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     marginVertical: 20,
-    width: '100%'
+    // width: '100%'
   },
   progressBarContainer: {
     position: 'absolute',
@@ -738,6 +738,7 @@ const progressStyling = StyleSheet.create({
     flex: 1,
     height: 4,
     borderRadius: 2,
+    borderColor: 'red',
   },
   progressBarFill: {
     backgroundColor: 'green',

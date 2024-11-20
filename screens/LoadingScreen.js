@@ -28,7 +28,7 @@ export default function LoadingScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image source={determinedLogo} style={styles.logo} />
-      <ActivityIndicator size="large" color={styles.activityIndicatorColor} />
+      <ActivityIndicator size= "large" color={styles.activityIndicatorColor} />
     </View>
   );
 }

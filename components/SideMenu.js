@@ -207,7 +207,7 @@ const localStyles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     marginLeft: 70,
-    paddingLeft: 20,
+    // paddingLeft: 20,
   },
   profileName: {
     marginTop: 10,

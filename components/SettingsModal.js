@@ -1,5 +1,5 @@
 //This will be the settings modal for dark mode, notifications, profile pic, etc.
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Switch, TextInput, StyleSheet, ScrollView, Alert, Image, Button, ActivityIndicator} from 'react-native';
 import {AuthContext} from '../context/AuthContext'
 import { determineGlobalStyles } from './Styles';
@@ -38,6 +38,14 @@ const SettingsScreen = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [loadingImage, setLoadingImage] = useState(false);
 
+  useEffect(() => {
+    // Fetch the current user information
+    const currentUser = Parse.User.current();
+    if (currentUser) {
+      setUsername(currentUser.getUsername());
+      setEmail(currentUser.get('email'));
+    }
+  }, []);
 
   //Helper function to change username
     const handleChangeUsername = () => {

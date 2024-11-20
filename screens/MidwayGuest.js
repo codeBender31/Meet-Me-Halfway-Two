@@ -200,7 +200,7 @@ const MidwayGuest = () => {
   <Text style={styles.bigButtonText}>Use Current Location</Text>
 </TouchableOpacity>
 
-{loading && <ActivityIndicator size="large" color="#007bff" style={{ marginTop: 10 }} />}
+{loading && <ActivityIndicator size= "large" color="#007bff" style={{ marginTop: 10 }} />}
 
   </View>
 )}
