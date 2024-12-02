@@ -1,6 +1,6 @@
 //This will serve as the notifications modal accessible from the side menu
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, ActivityIndicator} from 'react-native';
 import { determineGlobalStyles } from '../components/Styles'; 
 //Import the backend components from Connection
 import { getPendingRequests, handleFriendRequest } from '../models/Connection'; 
@@ -20,6 +20,7 @@ const {darkMode} = useContext(AuthContext)
   //This was the place holder variable name, will delete and convert to showConnectionRequests once debugging is complete
   const [connectionRequests, setConnectionRequests] = useState([]);
   const currentUser = Parse.User.current();
+  const [loading, setLoading] = useState(false);
   //Fake meeting requests that serve as placeholders 
   const [meetRequests, setMeetRequests] = useState([
     { id: '1', name: 'Emily Davis', time: '3:00 PM' },
@@ -117,27 +118,39 @@ const filteredMeetings = upcomingMeetings.filter(
 );
 
 
+// const fetchConnectionRequests = async () => {
+//   try {
+//     const pendingRequests = await getPendingRequests();
+
+//     // Check if there are any requests that need a response
+//     const requestsToRespondTo = pendingRequests.filter(request => request.status === 'pending');
+
+//     if (requestsToRespondTo.length > 0) {
+//       if (expoPushToken) {
+//         sendPushNotification(`You have ${requestsToRespondTo.length} friend requests to review.`);
+//       } else {
+//         console.log('Expo push token not yet available.');
+//       }
+//     }
+
+//     setConnectionRequests(pendingRequests);
+//   } catch (error) {
+//     console.error('Error fetching connection requests:', error);
+//   }
+// };
+
+
 const fetchConnectionRequests = async () => {
+  setLoading(true); // Start loading
   try {
     const pendingRequests = await getPendingRequests();
-
-    // Check if there are any requests that need a response
-    const requestsToRespondTo = pendingRequests.filter(request => request.status === 'pending');
-
-    if (requestsToRespondTo.length > 0) {
-      if (expoPushToken) {
-        sendPushNotification(`You have ${requestsToRespondTo.length} friend requests to review.`);
-      } else {
-        console.log('Expo push token not yet available.');
-      }
-    }
-
     setConnectionRequests(pendingRequests);
   } catch (error) {
     console.error('Error fetching connection requests:', error);
+  } finally {
+    setLoading(false); // Stop loading
   }
 };
-
 
 useEffect(() => {
   
@@ -152,7 +165,9 @@ useEffect(() => {
 
   const renderConnectionRequest = ({ item }) => (
     <View style={localStyles.notificationItem}>
-      <Text style={{ color: styles.loadingText.color }}>{item.name}</Text>
+     <Text style={{ color: styles.loadingText.color }}>
+          {item.name || 'Unknown User'}
+          </Text>
       <View style={localStyles.buttonContainer}>
         <TouchableOpacity
           style={localStyles.actionButton}

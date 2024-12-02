@@ -1,6 +1,6 @@
 //This modal will display any meeting objects that have been stored in the database and already sent out through sms
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, FlatList, ActivityIndicator, RefreshControl, Modal, TouchableOpacity, Button, Linking, Image, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, RefreshControl, Modal, TouchableOpacity, Button, Linking, Image, StyleSheet, ScrollView, SafeAreaView, Platform} from 'react-native';
 import Parse from 'parse/react-native.js';
 import { AuthContext } from '../context/AuthContext';
 import { determineGlobalStyles } from './Styles';
@@ -18,9 +18,35 @@ const APIkey= 'AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc'
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
 
+  // const openGoogleMaps = (latitude, longitude) => {
+  //   const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+  //   Linking.openURL(url).catch(err => console.error('Error opening Google Maps:', err));
+  // };
+
   const openGoogleMaps = (latitude, longitude) => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-    Linking.openURL(url).catch(err => console.error('Error opening Google Maps:', err));
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    const appleMapsUrl = `http://maps.apple.com/?daddr=${latitude},${longitude}`;
+  
+    if (Platform.OS === 'ios') {
+      // Check if Google Maps is installed on iOS
+      Linking.canOpenURL('comgooglemaps://').then((supported) => {
+        if (supported) {
+          Linking.openURL(`comgooglemaps://?daddr=${latitude},${longitude}`).catch((err) =>
+            console.error('Error opening Google Maps:', err)
+          );
+        } else {
+          // Fallback to Apple Maps
+          Linking.openURL(appleMapsUrl).catch((err) =>
+            console.error('Error opening Apple Maps:', err)
+          );
+        }
+      });
+    } else {
+      // Default to Google Maps on Android or browser fallback
+      Linking.openURL(googleMapsUrl).catch((err) =>
+        console.error('Error opening Google Maps:', err)
+      );
+    }
   };
 
   const openNearbySafePlacesModal = async (latitude, longitude) => {

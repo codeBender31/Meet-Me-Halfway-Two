@@ -17,6 +17,7 @@ const Map = ({ userAddress, friendAddress, midpoint }) => {
   //   Linking.openURL(url).catch(err => console.error('Error opening Google Maps:', err));
   // };
 
+  
   //Function to obtain the latitude and longitude from the address
   const geocodeAddress = async (address) => {
     const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address.formatted_address)}&key=AIzaSyDASA8fmLTGHD2P2wTN5Bh9S5NKOET-Gtc`);

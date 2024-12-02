@@ -265,7 +265,8 @@ const getPendingRequests = async () => {
 //Obatin the current request from the current user 
   query.equalTo("receiver", currentUser);
   //Only the requests with the pending status 
-  query.equalTo("status", "pending");      
+  query.equalTo("status", "pending"); 
+  query.include("sender");    
 //Wait for the method to finish 
 //Map the requests to a list of objects 
   try {

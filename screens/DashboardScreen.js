@@ -121,7 +121,7 @@ useEffect(() => {
         const friendsArray = currentUser.get('friends') || [];
         // const friendsArray = currentUser.get('friends') || currentUser.get('friendsList') || [];
 
-        console.log(friendsArray)
+        // console.log(friendsArray)
 
         // Fetch details for each friend in parallel with retry logic
         const friendPromises = friendsArray.map(async (friendPointer, index) => {
@@ -601,50 +601,6 @@ const handleCreateMeeting = async () => {
             >
              <Text style={styles.bigButtonText}>Create Meeting</Text>
             </TouchableOpacity>
-
-            {/* <TouchableOpacity
-            style={styles.bigButton}
-            onPress={() => {
-            // console.log(midpoint)
-            // console.log(selectedFriend)
-            if (midpoint && selectedFriend) {
-            const currentUser = Parse.User.current();
-            // console.log("CurrentUser " + currentUser)
-            const coordinates = midpoint;
-            // console.log("Coordinates " + coordinates)
-            const location = midpointAddress;
-            // console.log("Address " + midpointAddress)
-            const user1Id = currentUser.id;
-            // console.log("User1 " + user1Id)
-            const user2Id = selectedFriend.id;
-            // console.log(selectedFriend.name)
-            // console.log("User2 " + user2Id)
-
-          // Call createMeeting with necessary parameters
-          createMeeting(user1Id, user2Id, location, coordinates, time, date)
-          .then(() => {
-          Alert.alert('Meeting created successfully!');
-    //  // Schedule a push notification after creating the meeting
-    //  await Notifications.scheduleNotificationAsync({
-    //   content: {
-    //     title: "New Meeting Created!",
-    //     body: `You have successfully created a meeting with ${selectedFriend.username} at ${location}.`,
-    //   },
-    //   trigger: { seconds: 1 }, // Trigger after 1 second
-    // });
-          })
-          .catch((error) => {
-          console.error('Error creating meeting:', error);
-          Alert.alert('Error', 'Failed to create meeting. Please try again.');
-          });
-          } else {
-          Alert.alert('Error', 'Please select a friend and find the midpoint first.');
-          }
-          }}
-          >
-          <Text style={styles.bigButtonText}>Create Meeting</Text>
-          </TouchableOpacity> */}
-
         
             {showDatePicker && (
               <DateTimePicker
@@ -978,3 +934,46 @@ Alert.alert('Error', 'Please select a friend and find the midpoint first.');
         })}
         </Picker>
         </View> */}
+
+            {/* <TouchableOpacity
+            style={styles.bigButton}
+            onPress={() => {
+            // console.log(midpoint)
+            // console.log(selectedFriend)
+            if (midpoint && selectedFriend) {
+            const currentUser = Parse.User.current();
+            // console.log("CurrentUser " + currentUser)
+            const coordinates = midpoint;
+            // console.log("Coordinates " + coordinates)
+            const location = midpointAddress;
+            // console.log("Address " + midpointAddress)
+            const user1Id = currentUser.id;
+            // console.log("User1 " + user1Id)
+            const user2Id = selectedFriend.id;
+            // console.log(selectedFriend.name)
+            // console.log("User2 " + user2Id)
+
+          // Call createMeeting with necessary parameters
+          createMeeting(user1Id, user2Id, location, coordinates, time, date)
+          .then(() => {
+          Alert.alert('Meeting created successfully!');
+    //  // Schedule a push notification after creating the meeting
+    //  await Notifications.scheduleNotificationAsync({
+    //   content: {
+    //     title: "New Meeting Created!",
+    //     body: `You have successfully created a meeting with ${selectedFriend.username} at ${location}.`,
+    //   },
+    //   trigger: { seconds: 1 }, // Trigger after 1 second
+    // });
+          })
+          .catch((error) => {
+          console.error('Error creating meeting:', error);
+          Alert.alert('Error', 'Failed to create meeting. Please try again.');
+          });
+          } else {
+          Alert.alert('Error', 'Please select a friend and find the midpoint first.');
+          }
+          }}
+          >
+          <Text style={styles.bigButtonText}>Create Meeting</Text>
+          </TouchableOpacity> */}

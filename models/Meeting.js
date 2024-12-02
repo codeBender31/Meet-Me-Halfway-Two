@@ -1,6 +1,6 @@
 //This will be the model for meeting objects
 import Parse from 'parse/react-native.js';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import axios from 'axios';
 
 //Method to create meeting object between two users 
@@ -39,9 +39,35 @@ const createMeeting = async (user1Id, user2Id, location, coordinates, time, date
 };
 
 //Method to load the location on to google maps 
+// const openGoogleMaps = (latitude, longitude) => {
+//   const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+//   Linking.openURL(url).catch(err => console.error('Error opening Google Maps:', err));
+// };
+
 const openGoogleMaps = (latitude, longitude) => {
-  const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-  Linking.openURL(url).catch(err => console.error('Error opening Google Maps:', err));
+  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+  const appleMapsUrl = `http://maps.apple.com/?daddr=${latitude},${longitude}`;
+  // const appleMapsUrl = `http://maps.apple.com/?saddr=${startLatitude},${startLongitude}&daddr=${latitude},${longitude}`;
+  if (Platform.OS === 'ios') {
+    // Check if Google Maps is installed on iOS
+    Linking.canOpenURL('comgooglemaps://').then((supported) => {
+      if (supported) {
+        Linking.openURL(`comgooglemaps://?daddr=${latitude},${longitude}`).catch((err) =>
+          console.error('Error opening Google Maps:', err)
+        );
+      } else {
+        // Fallback to Apple Maps
+        Linking.openURL(appleMapsUrl).catch((err) =>
+          console.error('Error opening Apple Maps:', err)
+        );
+      }
+    });
+  } else {
+    // Default to Google Maps on Android or browser fallback
+    Linking.openURL(googleMapsUrl).catch((err) =>
+      console.error('Error opening Google Maps:', err)
+    );
+  }
 };
 
 //Helper function to correctly format the phone number 
@@ -86,7 +112,7 @@ const sendMeetingNotificationViaTwilio = async (user1, user2, meeting) => {
       console.log(`SMS sent successfully to ${to}`);
       console.log(`Twilio response:`, response.data);
     } catch (error) {
-      console.error('Error sending SMS:', error);
+      // console.error('Error sending SMS:', error);
     }
   };
 //Send the actual sms to both users 
@@ -120,5 +146,16 @@ const getUpcomingMeetings = async () => {
     return [];
   }
 };
+
+// //Method to send meeting details
+// Parse.Cloud.run("sendMeetingEmail", {
+//   userEmails: ["user1@example.com", "user2@example.com"],
+//   meetingDetails: "Meeting scheduled at 10:00 AM on 20th November."
+// }).then((response) => {
+//   console.log(response); // Meeting details sent to 2 recipients.
+// }).catch((error) => {
+//   console.error("Error:", error.message);
+// });
+
 export { createMeeting, openGoogleMaps, getUpcomingMeetings };
 
