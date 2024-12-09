@@ -30,7 +30,7 @@ import ScheduledMeetings from './components/ScheduledMeetings';
 // Initialize Parse SDK before any other operations
 Parse.setAsyncStorage(AsyncStorage);
 //Parse Application key and Javascript key 
-Parse.initialize('sNnxFWRF0ubJiUIjSXyx115133iIj0qvVtOA1kmr', '2GhwuMQUwlTxWKyi2TBBMqvGdapMZkzqlxafjCeL');
+Parse.initialize('', '');
 Parse.serverURL = 'https://parseapi.back4app.com/';
 
 const Stack = createStackNavigator();
