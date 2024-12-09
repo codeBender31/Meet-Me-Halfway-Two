@@ -6,7 +6,7 @@
 
 ## App Walkthrough
 
-[Alt](https://www.youtube.com/watch?v=YisTqdfJdy0)
+[Watch Demo On Youtube](https://www.youtube.com/watch?v=YisTqdfJdy0)
 
 # Getting Started with Meet Me Halfway
 
