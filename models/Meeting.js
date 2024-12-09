@@ -80,11 +80,11 @@ return `+${UScode}${phoneNumber}`
 const sendMeetingNotificationViaTwilio = async (user1, user2, meeting) => {
   //Define the twilio api necessary info 
   //Twilio sid 
-  const TWILIO_SID = 'ACc9e5ba46f556939d783038cc0cb69cb2';
+  const TWILIO_SID = '';
   //Twilio auth token
-  const TWILIO_AUTH_TOKEN = 'fe385249d46e6d927614ba7b26b181f8';
+  const TWILIO_AUTH_TOKEN = '';
   //Twilio phone number 
-  const TWILIO_PHONE_NUMBER = '+18447553198';
+  const TWILIO_PHONE_NUMBER = '';
 //Get the username of user1 and user 2
   const messageBody = `Meeting set between ${user1.get('username')} and ${user2.get('username')} at ${meeting.get('location')} on ${meeting.get('date')} at ${meeting.get('time')}.`;
 //Send the sms 
