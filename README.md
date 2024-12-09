@@ -6,7 +6,7 @@
 
 ## App Walkthrough
 
-![Alt Text]()
+![Alt Text](https://youtu.be/YisTqdfJdy0)
 
 # Getting Started with Meet Me Halfway
 
